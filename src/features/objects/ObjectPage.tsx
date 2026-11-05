@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { ApiError, useDeleteObject, useMe, useObject, useObjectTasks, userMessage, type BoardTask, type ObjectRow } from '@/shared/api';
 import { delay, movesFor, paths, plural } from '@/shared/lib';
 import { DeleteDialog, Icon, NotFoundState, QueryState, ReviewTile, Roll, useMoveFlash } from '@/shared/ui';
@@ -28,7 +28,6 @@ function DeleteObjectDialog({ object, tasks, onClose }: { object: ObjectRow; tas
 
 function ObjectHero({ object }: { object: ObjectRow }) {
   const me = useMe();
-  const navigate = useNavigate();
   const { data: tasks } = useObjectTasks(object.id);
   const { to } = useMoveFlash();
   const [editing, setEditing] = useState(false);
@@ -42,10 +41,10 @@ function ObjectHero({ object }: { object: ObjectRow }) {
     <section className={me.isManager ? 'hero is-boss' : 'hero'}>
       <div className="tile hero-title w">
         <div className="tk-bar">
-          <button className="back" type="button" onClick={() => navigate(paths.objects)}>
+          <Link className="back" to={paths.objects}>
             <Icon name="back" />
             Все объекты
-          </button>
+          </Link>
           {me.isManager && (
             <div className="tk-manage">
               <button className="ibtn" type="button" aria-label="Изменить объект" title="Изменить объект" onClick={() => setEditing(true)}>
@@ -114,13 +113,12 @@ function ObjectHero({ object }: { object: ObjectRow }) {
 /** Страница объекта: шапка, затем доска из board. key={objectId} ставит роутер. */
 export function ObjectPage({ objectId, board }: { objectId: string; board: ReactNode }) {
   const object = useObject(objectId);
-  const navigate = useNavigate();
   const notFound = (
     <NotFoundState
       action={
-        <button className="btn is-primary" type="button" onClick={() => navigate(paths.objects)}>
+        <Link className="btn is-primary" to={paths.objects}>
           Все объекты
-        </button>
+        </Link>
       }
     />
   );

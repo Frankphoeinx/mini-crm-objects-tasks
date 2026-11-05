@@ -66,7 +66,7 @@ describe('сводка', () => {
 
   it('чёрный блок ведёт на /review', async () => {
     renderPage();
-    await userEvent.click(screen.getByRole('button', { name: /Ждут проверки/ }));
+    await userEvent.click(screen.getByRole('link', { name: /Ждут проверки/ }));
     expect(where()).toHaveTextContent('/review');
   });
 
@@ -79,7 +79,7 @@ describe('сводка', () => {
 describe('плитки строек', () => {
   it('название, адрес, метки, процент, переход на объект', async () => {
     renderPage();
-    const tile = screen.getByRole('button', { name: /ЖК Северный/ });
+    const tile = screen.getByRole('link', { name: /ЖК Северный/ });
     expect(tile).toHaveTextContent('ул. Лесная, 14');
     expect(tile).toHaveTextContent('3 задачи');
     expect(tile).toHaveTextContent('1 ждёт проверки');
@@ -89,7 +89,7 @@ describe('плитки строек', () => {
     expect(tile.querySelectorAll('.fl')).toHaveLength(3);
     expect(tile.querySelectorAll('.fl.is-full')).toHaveLength(1);
 
-    const second = screen.getByRole('button', { name: /Склад/ });
+    const second = screen.getByRole('link', { name: /Склад/ });
     expect(second).toHaveTextContent('1 задача');
     expect(second).toHaveTextContent('На доработке');
     expect(second).not.toHaveTextContent('ждёт проверки');
@@ -106,7 +106,7 @@ describe('плитки строек', () => {
     [21, '21 ждёт проверки', '21 задача'],
   ])('подписи чисел: %i', (n, waiting, count) => {
     renderPage({ tasks: Array.from({ length: n }, (_, i) => task(`t${i}`, 'review')), objects: [makeObject()] });
-    const tile = screen.getByRole('button', { name: /ЖК Северный/ });
+    const tile = screen.getByRole('link', { name: /ЖК Северный/ });
     expect(tile).toHaveTextContent(waiting);
     expect(tile).toHaveTextContent(count);
   });
@@ -135,7 +135,7 @@ describe('состояния', () => {
     fake.respond('task_board', { data: tasks });
     renderPage({ objects: undefined, tasks: undefined });
     expect(screen.getByRole('status')).toHaveTextContent('Загружаем');
-    expect(await screen.findByRole('button', { name: /ЖК Северный/ })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /ЖК Северный/ })).toBeInTheDocument();
   });
 
   it.each(['objects', 'task_board'])('ошибка %s: текст и повтор', async (table) => {
@@ -149,7 +149,7 @@ describe('состояния', () => {
 
     fake.respond(table, { data: table === 'objects' ? objects : tasks });
     await userEvent.click(screen.getByRole('button', { name: 'Повторить' }));
-    expect(await screen.findByRole('button', { name: /ЖК Северный/ })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /ЖК Северный/ })).toBeInTheDocument();
   });
 });
 

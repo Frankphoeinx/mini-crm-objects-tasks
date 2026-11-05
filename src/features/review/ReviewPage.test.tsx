@@ -37,7 +37,7 @@ function renderPage(options: Parameters<typeof renderScreen>[1] = {}) {
 
 // Кэш запросов сообщает экрану об изменении нулевым таймером; при поддельных часах такой таймер, поставленный внутри другого, срабатывает через 1 мс.
 const flush = () => act(() => vi.advanceTimersByTimeAsync(1));
-const row = (title: string) => screen.getByRole('button', { name: title }).closest('article') as HTMLElement;
+const row = (title: string) => screen.getByRole('link', { name: title }).closest('article') as HTMLElement;
 
 beforeEach(() => fake.reset());
 
@@ -71,13 +71,13 @@ describe('строки', () => {
 
   it('строка открывает задачу, «назад» потом вернёт на проверку', async () => {
     renderPage();
-    await userEvent.click(screen.getByRole('button', { name: 'Ворота' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Ворота' }));
     expect(where()).toHaveTextContent('/tasks/t1 {"from":"review"}');
   });
 
   it('«Все объекты» ведёт к списку', async () => {
     renderPage();
-    await userEvent.click(screen.getByRole('button', { name: 'Все объекты' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Все объекты' }));
     expect(where()).toHaveTextContent('/objects');
   });
 });
@@ -105,7 +105,7 @@ describe('действия', () => {
     fireEvent.click(within(row('Ворота')).getByRole('button', { name: 'Принять' }));
     await flush();
 
-    expect(screen.queryByRole('button', { name: 'Ворота' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ворота' })).not.toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('Задача теперь «Принята»');
     expect(fake.rpc).not.toHaveBeenCalled();
 
@@ -119,11 +119,11 @@ describe('действия', () => {
     renderPage();
     fireEvent.click(within(row('Ворота')).getByRole('button', { name: 'Принять' }));
     await flush();
-    expect(screen.queryByRole('button', { name: 'Ворота' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ворота' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Отменить' }));
     await flush();
-    expect(screen.getByRole('button', { name: 'Ворота' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ворота' })).toBeInTheDocument();
     await act(() => vi.advanceTimersByTimeAsync(10_000));
     expect(fake.rpc).not.toHaveBeenCalled();
   });
@@ -134,14 +134,14 @@ describe('действия', () => {
     fireEvent.click(within(row('Ворота')).getByRole('button', { name: 'Вернуть на доработку' }));
 
     expect(screen.getByRole('dialog', { name: 'Вернуть на доработку' })).toHaveTextContent('Ворота');
-    expect(screen.getByRole('button', { name: 'Ворота' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ворота' })).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('Что нужно исправить'), { target: { value: 'Перекошены' } });
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Вернуть' }));
     await flush();
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Ворота' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ворота' })).not.toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('Задача теперь «На доработке»');
   });
 
@@ -160,7 +160,7 @@ describe('действия', () => {
     await flush();
 
     expect(screen.getByLabelText('Что нужно исправить')).toHaveValue('Перекошены');
-    expect(screen.getByRole('button', { name: 'Ворота' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ворота' })).toBeInTheDocument();
   });
 });
 
@@ -169,7 +169,7 @@ describe('состояния', () => {
     renderPage({ tasks: [hidden] });
     expect(screen.getByRole('heading', { name: 'Сейчас ничего не ждёт проверки' })).toBeInTheDocument();
     expect(screen.getByText('Когда исполнитель сдаст работу, задача появится здесь.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Все объекты' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Все объекты' })).toBeInTheDocument();
   });
 
   it('загрузка: заголовок и кнопка на месте, «ничего нет» не мелькает', async () => {
@@ -180,7 +180,7 @@ describe('состояния', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Загружаем');
     expect(screen.getByRole('heading', { level: 1, name: 'Ждут проверки' })).toBeInTheDocument();
     expect(screen.queryByText('Сейчас ничего не ждёт проверки')).not.toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: 'Ворота' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Ворота' })).toBeInTheDocument();
     expect(row('Ворота')).toHaveTextContent('Пётр');
   });
 
@@ -191,11 +191,11 @@ describe('состояния', () => {
     renderScreen(<ReviewPage />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Что-то пошло не так');
-    expect(screen.queryByRole('button', { name: 'Ворота' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ворота' })).not.toBeInTheDocument();
 
     fake.respond(table, { data: good[table as keyof typeof good] });
     await userEvent.click(screen.getByRole('button', { name: 'Повторить' }));
-    expect(await screen.findByRole('button', { name: 'Ворота' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Ворота' })).toBeInTheDocument();
     expect(row('Ворота')).toHaveTextContent('Пётр');
   });
 });

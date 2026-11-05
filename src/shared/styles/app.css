@@ -22,6 +22,11 @@
 
 .bs .page-main:focus-visible { outline: none; }
 
+/* Переходы сделаны ссылками, чтобы открывать в новой вкладке. :where не перебивает цвета и раскладку плиток и кнопок. */
+:where(.bs a) { color: inherit; text-decoration: none; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+:where(.bs a.tile) { display: block; text-align: left; }
+:where(.bs a.tab) { display: inline-flex; align-items: center; justify-content: center; }
+
 /* Редактор описания: поле как .input, панель без рамок, шрифт поля не меньше 16 px, чтобы телефон не увеличивал страницу. */
 .rt-label { font-size: 14px; font-weight: 500; }
 .rt, .rt-view { width: 100%; min-width: 0; }

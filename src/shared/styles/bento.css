@@ -47,7 +47,7 @@ body { margin: 0; background: #F2F2F4; }
 .lift { transition: transform .14s var(--out); }
 .lift::after { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; box-shadow: 0 16px 36px rgba(17, 17, 17, .16); opacity: 0; transition: opacity .14s; pointer-events: none; }
 .art { transition: transform .15s var(--out); }
-button.lift:active { transform: scale(.985); transition-duration: 80ms; }
+.lift:active { transform: scale(.985); transition-duration: 80ms; }
 @media (hover: hover) {
   .lift:hover { transform: translateY(-3px); }
   .lift:hover::after { opacity: 1; }
@@ -157,7 +157,7 @@ textarea.input { min-height: 96px; resize: vertical; }
 @keyframes bs-swing { 25% { transform: rotate(5deg); } 60% { transform: rotate(-2.5deg); } }
 .big-n { display: block; font-size: clamp(56px, 5vw, 72px); font-weight: 800; line-height: 1; }
 .big-l { display: block; margin-top: 6px; font-size: 15px; font-weight: 500; color: var(--on-ink); }
-button .big-l::after { content: ' →'; }
+a .big-l::after { content: ' →'; }
 
 /* Оранжевая плитка */
 .t-orange { display: flex; flex-direction: column; width: 100%; background: var(--acc); color: var(--ink); text-align: left; }

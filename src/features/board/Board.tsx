@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useMe, userMessage, useUpdateTask, type BoardTask, type Profile, type TaskStatus } from '@/shared/api';
 import { buildBoard, canAssign, canClearAssignee, delay, movesFor, paths, taskLinkState, type Move, type TaskFrom } from '@/shared/lib';
 import { ERROR_TOAST_MS, FOCUS_DELAY_MS, focusTask, Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
@@ -39,7 +38,6 @@ type BoardProps = {
 /** Доска для страницы объекта и «Моих задач»: колонки, карточки, перетаскивание, кнопки. */
 export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
   const me = useMe();
-  const navigate = useNavigate();
   const flash = useMoveFlash();
   const { showToast } = useToast();
   const { requestMove, moveDialog } = useRequestMove();
@@ -112,7 +110,8 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
                         dragging={drag.draggingId === task.id}
                         landed={flash.taskId === task.id}
                         dragProps={drag.cardProps(task, moves)}
-                        onOpen={() => navigate(paths.task(task.id), { state: taskLinkState(from) })}
+                        to={paths.task(task.id)}
+                        linkState={taskLinkState(from)}
                         onMove={(chosen) => move(task, chosen)}
                         onTarget={setTarget}
                         onAssign={people && canAssign(task, me) ? (anchor) => setAssigning({ task, anchor }) : undefined}

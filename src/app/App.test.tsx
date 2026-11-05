@@ -176,7 +176,7 @@ describe('состояния каркаса', () => {
     signedIn(worker);
     expect(await screen.findByRole('heading', { name: 'Здесь ничего нет' })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'К объектам' }));
+    await user.click(screen.getByRole('link', { name: 'К объектам' }));
     expect(pathOf(router)).toBe('/objects');
   });
 
@@ -197,8 +197,8 @@ describe('верхняя панель', () => {
     signedIn(manager);
     expect(await screen.findByText('Анна Смирнова')).toBeInTheDocument();
     expect(screen.getByText('Постановщик')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Объекты' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('button', { name: 'Мои задачи' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Объекты' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Мои задачи' })).not.toHaveAttribute('aria-current');
     expect(document.querySelector('.tab-n')).not.toBeInTheDocument();
   });
 
@@ -221,12 +221,12 @@ describe('верхняя панель', () => {
     const user = userEvent.setup();
     const { router } = setup('/objects');
     signedIn(worker);
-    await user.click(await screen.findByRole('button', { name: 'Мои задачи' }));
+    await user.click(await screen.findByRole('link', { name: 'Мои задачи' }));
     expect(pathOf(router)).toBe('/my');
-    expect(screen.getByRole('button', { name: 'Мои задачи' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Мои задачи' })).toHaveAttribute('aria-current', 'page');
     expect(document.querySelector('.tabs-thumb')).toHaveStyle({ transform: 'translateX(100%)' });
 
-    await user.click(screen.getByRole('button', { name: 'Объекты' }));
+    await user.click(screen.getByRole('link', { name: 'Объекты' }));
     expect(pathOf(router)).toBe('/objects');
   });
 
@@ -299,7 +299,7 @@ describe('окно отмены внутри сайта', () => {
 
   it('переход между экранами окно не закрывает', async () => {
     await startMove();
-    fireEvent.click(screen.getByRole('button', { name: 'Объекты' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Объекты' }));
     await advance(0);
     expect(screen.getByRole('button', { name: 'Отменить' })).toBeInTheDocument();
     await advance(10_000);

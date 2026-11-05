@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import {
   ApiError,
   useDeleteTask,
@@ -26,14 +26,13 @@ export function TaskPage({ taskId }: { taskId: string }) {
   const task = useTask(taskId);
   const profiles = useProfiles();
   const objects = useObjects();
-  const navigate = useNavigate();
 
   const notFound = (
     <NotFoundState
       action={
-        <button className="btn is-primary" type="button" onClick={() => navigate(paths.objects)}>
+        <Link className="btn is-primary" to={paths.objects}>
           К объектам
-        </button>
+        </Link>
       }
     />
   );
@@ -74,10 +73,10 @@ function TaskCard({ task, profiles, objects }: TaskCardProps) {
         <div className="tile tk-title w">
           <span className="fx" aria-hidden="true"></span>
           <div className="tk-bar">
-            <button className="back" type="button" onClick={() => navigate(back.path)}>
+            <Link className="back" to={back.path}>
               <Icon name="back" />
               {back.label}
-            </button>
+            </Link>
             {isReturned(task) && <ReturnedChip />}
             {me.isManager && (
               <div className="tk-manage">
