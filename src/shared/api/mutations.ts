@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useUndo } from '../ui/UndoProvider/UndoProvider';
 import { supabase } from './client';
 import { unwrap } from './errors';
 import { keys } from './queries';
@@ -36,17 +37,21 @@ function forgetTask(queryClient: QueryClient, id: string) {
 
 export function useDeleteObject() {
   const queryClient = useQueryClient();
+  const { discard } = useUndo();
   return useMutation({
     mutationFn: async (id: string) => {
       unwrap(await supabase.rpc('delete_object', { p_object_id: id }));
     },
     onSuccess: (_data, id) => {
+      queryClient.getQueryData<BoardTask[]>(keys.board)?.filter((t) => t.object_id === id).forEach((t) => discard(t.id));
       queryClient.setQueryData<ObjectRow[]>(keys.objectList, (rows) => rows?.filter((o) => o.id !== id));
       queryClient.setQueryData<BoardTask[]>(keys.board, (rows) => rows?.filter((t) => t.object_id !== id));
       return Promise.all([
         queryClient.invalidateQueries({ queryKey: keys.objectList }),
         queryClient.invalidateQueries({ queryKey: keys.object(id), refetchType: 'none' }),
-        queryClient.invalidateQueries({ queryKey: keys.board }),
+        // Открытая карточка задачи сейчас не на экране: перезапросится доска, карточки и история при следующем открытии.
+        queryClient.invalidateQueries({ queryKey: keys.tasks }),
+        queryClient.invalidateQueries({ queryKey: keys.allEvents, refetchType: 'none' }),
       ]);
     },
   });
@@ -81,10 +86,14 @@ export function useUpdateTask() {
 
 export function useDeleteTask() {
   const queryClient = useQueryClient();
+  const { discard } = useUndo();
   return useMutation({
     mutationFn: async (id: string) => {
       unwrap(await supabase.rpc('delete_task', { p_task_id: id }));
     },
-    onSuccess: (_data, id) => forgetTask(queryClient, id),
+    onSuccess: (_data, id) => {
+      discard(id);
+      return forgetTask(queryClient, id);
+    },
   });
 }

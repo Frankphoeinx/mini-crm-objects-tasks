@@ -1,7 +1,7 @@
 import type { CSSProperties, DragEvent } from 'react';
 import type { BoardTask, TaskStatus } from '@/shared/api';
 import { isReturned, type Move } from '@/shared/lib';
-import { Icon, type IconName } from '@/shared/ui';
+import { Icon, MoveButtons, ReturnedChip, type IconName } from '@/shared/ui';
 
 export type CardMeta = { icon: IconName; text: string };
 
@@ -55,31 +55,8 @@ export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, d
         <Icon name={meta.icon} />
         {meta.text}
       </span>
-      {returned && (
-        <span className="chip st-rework">
-          <Icon name="rework" />
-          Доработка
-        </span>
-      )}
-      {needsMe && (
-        <span className="kacts">
-          {moves.map((move) => (
-            <button
-              key={move.to}
-              className={`kq ${move.danger ? 'is-danger' : 'is-primary'}`}
-              type="button"
-              aria-label={move.label}
-              onClick={() => onMove(move)}
-              onMouseEnter={() => onTarget(move.to)}
-              onMouseLeave={() => onTarget(null)}
-              onFocus={() => onTarget(move.to)}
-              onBlur={() => onTarget(null)}
-            >
-              {move.short}
-            </button>
-          ))}
-        </span>
-      )}
+      {returned && <ReturnedChip />}
+      {needsMe && <MoveButtons moves={moves} onMove={onMove} onTarget={onTarget} />}
       {onAssign && (
         <span className="kacts">
           <button className="kassign" type="button" aria-haspopup="listbox" aria-label="Назначить исполнителя" disabled={assignBusy} onClick={(e) => onAssign(e.currentTarget)}>

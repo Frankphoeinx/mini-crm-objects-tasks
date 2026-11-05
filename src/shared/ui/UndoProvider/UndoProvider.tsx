@@ -57,10 +57,10 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/** run(action): показать действие и открыть окно отмены. */
+/** run(action): показать действие и открыть окно отмены. discard(key): снять действия удалённой записи. */
 export function useUndo() {
-  const { run } = useStore();
-  return { run };
+  const { run, discard } = useStore();
+  return { run, discard };
 }
 
 /** showToast(text, ms?): подсказка внизу экрана. */

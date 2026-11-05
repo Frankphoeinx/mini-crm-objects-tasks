@@ -1,8 +1,5 @@
 import { useUpdateTask, userMessage, type TaskPatch } from '@/shared/api';
-import { useToast } from '@/shared/ui';
-
-// Столько же держится отказ при смене статуса в очереди отмены.
-const ERROR_TOAST_MS = 6_000;
+import { ERROR_TOAST_MS, useToast } from '@/shared/ui';
 
 /** Правка задачи на месте. Отказ базы показан подсказкой: её видно, даже если экран уже закрыли. Промис save не падает. */
 export function useSaveTask(taskId: string) {

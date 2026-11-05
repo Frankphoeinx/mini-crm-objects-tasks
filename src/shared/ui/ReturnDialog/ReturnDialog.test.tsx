@@ -93,6 +93,17 @@ describe('useRequestMove', () => {
     expect(fake.rpc).toHaveBeenCalledWith('change_task_status', { p_task_id: 't1', p_to: 'rework', p_comment: 'Перекошены' });
   });
 
+  it('«Отменить» не теряет комментарий: следующий возврат начнётся с того же текста', () => {
+    setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Вернуть' }));
+    fireEvent.change(screen.getByLabelText('Что нужно исправить'), { target: { value: 'Длинный текст причины' } });
+    fireEvent.click(screen.getAllByRole('button', { name: 'Вернуть' }).at(-1) as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: 'Отменить' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Вернуть' }));
+    expect(screen.getByLabelText('Что нужно исправить')).toHaveValue('Длинный текст причины');
+  });
+
   it('потеря сети не теряет комментарий: окно открывается снова с тем же текстом (AC-18)', async () => {
     fake.respond('change_task_status', { error: { message: 'TypeError: Failed to fetch' }, status: 0 });
     setup();

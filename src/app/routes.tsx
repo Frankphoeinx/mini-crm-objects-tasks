@@ -1,6 +1,5 @@
 import { Outlet, ScrollRestoration, useNavigate, useParams, type RouteObject } from 'react-router';
-import { ObjectBoard } from '@/features/board';
-import { MyTasksPage } from '@/features/my';
+import { MyTasksPage, ObjectBoard } from '@/features/board';
 import { ObjectPage, ObjectsPage } from '@/features/objects';
 import { ReviewPage } from '@/features/review';
 import { TaskPage } from '@/features/task';

@@ -1,12 +1,8 @@
-import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import { useMe, useMyTasks, useMyTurnCount, useObjects, useReviewTasks, type BoardTask, type ObjectRow } from '@/shared/api';
-import { paths } from '@/shared/lib';
-import { Crane, EmptyState, Icon, QueryState, Roll } from '@/shared/ui';
-// Исключение из правила «фичи не импортируют друг друга» (линтер ловит только @/features/*): доска одна на два экрана, а shared и роутер правит другой пакет.
-import { Board } from '../board';
-
-const delay = (d: string) => ({ '--d': d }) as CSSProperties;
+import { delay, paths } from '@/shared/lib';
+import { EmptyState, Icon, QueryState, ReviewTile, Roll } from '@/shared/ui';
+import { Board } from './Board';
 
 function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] }) {
   const me = useMe();
@@ -33,13 +29,7 @@ function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] 
             </div>
           </div>
         </div>
-        <button className="tile t-crane hero-crane lift w" style={delay('25ms')} type="button" onClick={() => navigate(paths.review)}>
-          <Crane />
-          <span className="big-n">
-            <Roll value={waiting} />
-          </span>
-          <span className="big-l">Ждут проверки</span>
-        </button>
+        <ReviewTile hero waiting={waiting} />
         <div className="hero-side">
           <div className="tile t-orange w" style={delay('50ms')}>
             <span className="lbl">Ваш ход</span>

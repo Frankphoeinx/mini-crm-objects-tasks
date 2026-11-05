@@ -23,6 +23,8 @@ export type MoveOptions = {
   comment?: string | null;
   /** База отказала или нет связи: верните текст комментария в поле, ввод не должен пропасть. */
   onRefused?: () => void;
+  /** Пользователь нажал «Отменить»: текст комментария тоже не должен пропасть. */
+  onUndone?: () => void;
 };
 
 /**
@@ -93,6 +95,7 @@ export function useMoveTask() {
           void queryClient.invalidateQueries({ queryKey: keys.events(task.id) });
         },
         onRefused: options.onRefused,
+        onUndone: options.onUndone,
       });
     },
     [queryClient, actorId, run],

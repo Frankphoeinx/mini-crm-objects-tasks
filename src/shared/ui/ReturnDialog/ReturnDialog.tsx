@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
+import { COMMENT_REQUIRED } from '../../lib/status';
 import { Dialog } from '../Dialog';
 
-const COMMENT_REQUIRED = 'Напишите, что нужно исправить: без комментария вернуть нельзя.';
 const TITLE = 'Вернуть на доработку';
 
 type ReturnDialogProps = {

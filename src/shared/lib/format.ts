@@ -1,3 +1,8 @@
+import type { CSSProperties } from 'react';
+
+/** Задержка волны появления (.w). */
+export const delay = (d: string) => ({ '--d': d }) as CSSProperties;
+
 /** plural(3, 'задача', 'задачи', 'задач') даёт «3 задачи». */
 export function plural(n: number, one: string, few: string, many: string) {
   const a = n % 10;

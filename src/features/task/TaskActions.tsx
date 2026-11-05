@@ -1,9 +1,7 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import { useMe, useMoveTask, type BoardTask, type Profile } from '@/shared/api';
-import { formatDateTime, fullName, isReturned, movesFor, shortName, STATUS_LABEL, type Move } from '@/shared/lib';
+import { COMMENT_REQUIRED, formatDateTime, fullName, isReturned, movesFor, shortName, STATUS_LABEL, type Move } from '@/shared/lib';
 import { Icon } from '@/shared/ui';
-
-const NEED_COMMENT = 'Напишите, что нужно исправить: без комментария вернуть нельзя.';
 
 function waitText(task: BoardTask, profiles: Profile[]) {
   if (task.status === 'accepted') return 'Задача принята, дальше действий нет.';
@@ -26,14 +24,15 @@ export function TaskActions({ task, profiles }: { task: BoardTask; profiles: Pro
   function run(move: Move) {
     const text = comment.trim();
     if (move.needComment && !text) {
-      setError(NEED_COMMENT);
+      setError(COMMENT_REQUIRED);
       commentRef.current?.focus();
       return;
     }
     setComment('');
     setError('');
-    // База отказала или нет связи: комментарий возвращается в поле, если там ещё не начали новый.
-    moveTask(task, move.to, { comment: text, onRefused: () => setComment((current) => current || text) });
+    // Отмена, отказ базы или нет связи: комментарий возвращается в поле, если там ещё не начали новый.
+    const giveBack = () => setComment((current) => current || text);
+    moveTask(task, move.to, { comment: text, onRefused: giveBack, onUndone: giveBack });
   }
 
   return (

@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import { useMe, useObjects, useProfiles, useReviewTasks, type BoardTask, type ObjectRow, type Profile } from '@/shared/api';
 import { isReturned, movesFor, paths, shortName, taskLinkState, waveDelay } from '@/shared/lib';
-import { Icon, QueryState, useRequestMove } from '@/shared/ui';
+import { Icon, MoveButtons, QueryState, ReturnedChip, useRequestMove } from '@/shared/ui';
 
 function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects: ObjectRow[]; profiles: Profile[] }) {
   const me = useMe();
@@ -30,12 +30,7 @@ function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects:
                   {task.title}
                 </span>
               </button>
-              {returned && (
-                <span className="chip st-rework">
-                  <Icon name="rework" />
-                  Доработка
-                </span>
-              )}
+              {returned && <ReturnedChip />}
               <span className="kmeta">
                 <Icon name="pin" />
                 {objects.find((o) => o.id === task.object_id)?.name}
@@ -44,15 +39,7 @@ function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects:
                 <Icon name="work" />
                 {shortName(profiles, task.assignee_id)}
               </span>
-              {moves.length > 0 && (
-                <span className="kacts">
-                  {moves.map((move) => (
-                    <button key={move.to} className={move.danger ? 'kq is-danger' : 'kq is-primary'} type="button" aria-label={move.label} onClick={() => requestMove(task, move)}>
-                      {move.short}
-                    </button>
-                  ))}
-                </span>
-              )}
+              {moves.length > 0 && <MoveButtons moves={moves} onMove={(move) => requestMove(task, move)} />}
             </article>
           );
         })}

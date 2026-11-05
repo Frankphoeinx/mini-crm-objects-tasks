@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import { useMe, userMessage, useUpdateTask, type BoardTask, type Profile, type TaskStatus } from '@/shared/api';
 import { buildBoard, canAssign, canClearAssignee, movesFor, paths, taskLinkState, type Move, type TaskFrom } from '@/shared/lib';
-import { Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
+import { ERROR_TOAST_MS, Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
 import { BoardCard, cx, type CardMeta } from './BoardCard';
 import { useCardDrag } from './useCardDrag';
 import { useCardFlip } from './useCardFlip';
@@ -125,7 +125,7 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
           value=""
           options={personOptions(people, canClearAssignee(assigning.task.status))}
           onPick={(id) => {
-            if (id) assign.mutate({ id: assigning.task.id, patch: { assignee_id: id } }, { onError: (error) => showToast(userMessage(error)) });
+            if (id) assign.mutate({ id: assigning.task.id, patch: { assignee_id: id } }, { onError: (error) => showToast(userMessage(error), ERROR_TOAST_MS) });
           }}
           onClose={() => setAssigning(null)}
         />

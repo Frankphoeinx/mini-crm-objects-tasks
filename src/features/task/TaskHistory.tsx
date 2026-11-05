@@ -59,7 +59,8 @@ export function TaskHistory({ taskId, profiles }: { taskId: string; profiles: Pr
           const isNew = i === lastAt && flash.to !== null && flash.taskId === taskId;
           return (
             <li
-              key={event.id}
+              // История только дополняется. По номеру в списке: временная строка получит id из базы, но не появится заново.
+              key={i}
               className={`ev w${event.kind === 'edit' ? ' is-edit' : ''}${isNew ? ' is-new' : ''}`}
               style={{ '--d': isNew ? '0ms' : waveDelay(i) } as CSSProperties}
             >

@@ -119,6 +119,11 @@ describe('signIn и signOut', () => {
     await expect(signIn('a@b.c', 'x')).resolves.toBe('Неверная почта или пароль.');
   });
 
+  it('выход только на этом устройстве: другой человек с той же демо-учёткой остаётся на сайте', async () => {
+    await signOut();
+    expect(fake.auth.signOut).toHaveBeenCalledWith({ scope: 'local' });
+  });
+
   it('выход сообщает об ошибке', async () => {
     await expect(signOut()).resolves.toBe(true);
     fake.auth.signOut.mockResolvedValueOnce({ error: { message: 'сеть' } });

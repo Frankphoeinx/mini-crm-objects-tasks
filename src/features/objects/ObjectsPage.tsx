@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useBoardTasks, useMe, useMyTurnCount, useObjects, type BoardTask, type ObjectRow } from '@/shared/api';
-import { paths, percent, plural, ratio, waveDelay } from '@/shared/lib';
-import { Building, Icon, QueryState, Roll, Tape } from '@/shared/ui';
+import { delay, paths, percent, plural, ratio, waveDelay } from '@/shared/lib';
+import { Building, Icon, QueryState, ReviewTile, Roll, Tape } from '@/shared/ui';
 import { ObjectDialog } from './ObjectDialog';
-import { delay, objectStats, ReadyTile, ReviewTile } from './SummaryTiles';
+import { objectStats, ReadyTile } from './SummaryTiles';
 
 function ObjectTile({ object, tasks, index }: { object: ObjectRow; tasks: BoardTask[]; index: number }) {
   const navigate = useNavigate();

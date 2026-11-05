@@ -21,7 +21,7 @@ export default defineConfig([
     files: ['src/features/**'],
     ignores: ['**/*.test.*'],
     rules: restrict(
-      ['@/features/*', '@/app/*', '@/shared/*/*'],
+      ['@/features/*', '@/app/*', '@/shared/*/*', '../*'],
       'Фича берёт общее из @/shared/ui, @/shared/api, @/shared/lib и не импортирует другие фичи: их собирает src/app.',
     ),
   },

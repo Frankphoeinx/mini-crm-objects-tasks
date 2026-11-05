@@ -14,6 +14,8 @@ export type UndoAction = {
   /** После любого исхода: сверить показ с базой. */
   settle?(): void;
   onRefused?(error: unknown): void;
+  /** Пользователь нажал «Отменить». */
+  onUndone?(): void;
   flash?: { to: string; taskId: string };
 };
 
@@ -72,23 +74,29 @@ export function createUndoStore(describeError: (error: unknown) => string) {
     action.settle?.();
   }
 
+  function refuse(action: UndoAction, error: unknown) {
+    if (current?.action.key === action.key) closeWindow();
+    // Следующие действия над той же записью строились на отказанном. Снимаем с последнего: откат каждого возвращает состояние до него.
+    for (const taken of [...live].filter((a) => a.key === action.key).reverse()) {
+      takeBack(taken);
+      taken.onRefused?.(error);
+    }
+    showToast(describeError(error), ERROR_TOAST_MS);
+  }
+
   function send(action: UndoAction) {
-    chain = chain.then(action.commit).then(
-      () => {
-        live.delete(action);
-        action.settle?.();
-      },
-      (error: unknown) => {
-        // Следующее действие над той же записью строилось на отказанном: снимаем сначала его.
-        if (current?.action.key === action.key) {
-          const dependent = closeWindow();
-          if (dependent) takeBack(dependent);
-        }
-        takeBack(action);
-        action.onRefused?.(error);
-        showToast(describeError(error), ERROR_TOAST_MS);
-      },
-    );
+    chain = chain.then(async () => {
+      // Снято вместе с отказанным предыдущим шагом или удалено: в базу не идёт.
+      if (!live.has(action)) return;
+      try {
+        await action.commit();
+      } catch (error) {
+        refuse(action, error);
+        return;
+      }
+      live.delete(action);
+      action.settle?.();
+    });
   }
 
   return {
@@ -121,7 +129,14 @@ export function createUndoStore(describeError: (error: unknown) => string) {
       const action = closeWindow();
       if (!action) return;
       takeBack(action);
+      action.onUndone?.();
       if (action.flash) showFlash({ to: null, taskId: action.flash.taskId });
+    },
+
+    /** Запись удалена: её неподтверждённые действия в базу не идут. Показ не откатываем, записи на экране больше нет. */
+    discard(key: string) {
+      if (current?.action.key === key) closeWindow();
+      for (const action of live) if (action.key === key) live.delete(action);
     },
 
     /** Фоновая загрузка заменила данные в кэше: возвращаем поверх них ещё не подтверждённые действия. */

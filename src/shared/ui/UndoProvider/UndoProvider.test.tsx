@@ -7,6 +7,8 @@ import { createTestQueryClient } from '../../test';
 import { useMoveFlash, UndoProvider, useToast, useUndo, type UndoAction } from './index';
 
 let run: (action: UndoAction) => void;
+let discard: (key: string) => void;
+let undo: () => void;
 let showToast: (text: string, ms?: number) => void;
 let flash: () => string;
 
@@ -19,6 +21,8 @@ function setup() {
   );
   const view = renderHook(() => ({ ...useUndo(), ...useToast(), flash: useMoveFlash() }), { wrapper });
   run = (action) => view.result.current.run(action);
+  discard = (key) => view.result.current.discard(key);
+  undo = () => fireEvent.click(screen.getByRole('button', { name: 'Отменить' }));
   showToast = (text, ms) => view.result.current.showToast(text, ms);
   flash = () => `${view.result.current.flash.to ?? '-'}/${view.result.current.flash.taskId ?? '-'}`;
   return { ...view, queryClient };
@@ -220,6 +224,52 @@ describe('UndoProvider (AC-12)', () => {
 
     await act(() => queryClient.fetchQuery({ queryKey: ['tasks'], queryFn: async () => [], staleTime: 0 }));
     expect(action.apply).not.toHaveBeenCalled();
+  });
+
+  it('первый отказал, когда второй уже ждал очереди: второй в базу не идёт, откат с последнего шага', async () => {
+    setup();
+    const order: string[] = [];
+    let refuse: (error: unknown) => void = () => {};
+    const first = makeAction({
+      commit: vi.fn(() => new Promise<void>((_, reject) => { refuse = reject; })),
+      revert: vi.fn(() => order.push('первый')),
+    });
+    const second = makeAction({ revert: vi.fn(() => order.push('второй')) });
+    act(() => run(first));
+    act(() => run(second));
+    await advance(10_000);
+    await act(async () => refuse(new ApiError('refused', 'Нельзя')));
+    await advance(0);
+    expect(second.commit).not.toHaveBeenCalled();
+    expect(order).toEqual(['второй', 'первый']);
+    expect(second.onRefused).toHaveBeenCalledTimes(1);
+  });
+
+  it('«Отменить» сообщает о снятии: ввод можно вернуть', () => {
+    setup();
+    const action = makeAction({ onUndone: vi.fn() });
+    act(() => run(action));
+    undo();
+    expect(action.onUndone).toHaveBeenCalledTimes(1);
+    expect(action.onRefused).not.toHaveBeenCalled();
+  });
+
+  it('запись удалена: её действие снимается без запроса в базу и без отката', async () => {
+    setup();
+    const action = makeAction();
+    act(() => run(action));
+    act(() => discard('t1'));
+    expect(screen.queryByRole('button', { name: 'Отменить' })).toBeNull();
+    await advance(10_000);
+    expect(action.commit).not.toHaveBeenCalled();
+    expect(action.revert).not.toHaveBeenCalled();
+  });
+
+  it('удаление другой записи окно отмены не трогает', () => {
+    setup();
+    act(() => run(makeAction()));
+    act(() => discard('t2'));
+    expect(screen.getByRole('button', { name: 'Отменить' })).toBeTruthy();
   });
 
   it('фоновая загрузка возвращает неподтверждённое действие поверх новых данных', async () => {

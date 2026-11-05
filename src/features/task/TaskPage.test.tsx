@@ -536,6 +536,15 @@ describe('блок действий (AC-8, AC-15, AC-16)', () => {
       expect(commentField()).toHaveValue('Второй');
     });
 
+    it('«Отменить» возвращает написанный комментарий в поле', async () => {
+      open({ task: review });
+      fireEvent.change(commentField(), { target: { value: 'Нет акта' } });
+      await press('Принять');
+      fireEvent.click(screen.getByRole('button', { name: 'Отменить' }));
+      await advance(0);
+      expect(commentField()).toHaveValue('Нет акта');
+    });
+
     it('второй щелчок двойного нажатия не меняет статус дальше', async () => {
       open({ me: worker });
       await press('Взять в работу');
@@ -546,6 +555,14 @@ describe('блок действий (AC-8, AC-15, AC-16)', () => {
 });
 
 describe('история (AC-3, AC-13)', () => {
+  it('запись не пересоздаётся, когда временная строка получает настоящий номер из базы', async () => {
+    const { queryClient } = open({ events: [makeEvent({ id: -1, kind: 'status', from_status: 'new', to_status: 'work' })] });
+    const before = screen.getByText('Новая → В работе').closest('li');
+    act(() => queryClient.setQueryData(keys.events('t1'), [makeEvent({ id: 7, kind: 'status', from_status: 'new', to_status: 'work' }), makeEvent({ id: 8, kind: 'edit', field: 'title', to_status: null })]));
+    await screen.findByText('Название изменено');
+    expect(screen.getByText('Новая → В работе').closest('li')).toBe(before);
+  });
+
   const edit = (field: TaskEvent['field'], old_value: string | null, new_value: string | null) => makeEvent({ kind: 'edit', to_status: null, field, old_value, new_value });
 
   it.each([

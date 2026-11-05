@@ -22,12 +22,12 @@ vi.mock('@/features/objects', () => ({
     </>
   ),
 }));
-vi.mock('@/features/board', () => ({ ObjectBoard: ({ objectId }: { objectId: string }) => <p>Доска объекта {objectId}</p> }));
 vi.mock('@/features/task', () => ({ TaskPage: ({ taskId }: { taskId: string }) => <h1>Экран задачи {taskId}</h1> }));
-vi.mock('@/features/my', async () => {
+vi.mock('@/features/board', async () => {
   const { useMoveTask } = await import('@/shared/api');
   const { makeTask, worker: assignee } = await import('@/shared/test');
   return {
+    ObjectBoard: ({ objectId }: { objectId: string }) => <p>Доска объекта {objectId}</p>,
     MyTasksPage: function MyTasksPage() {
       const move = useMoveTask();
       return (

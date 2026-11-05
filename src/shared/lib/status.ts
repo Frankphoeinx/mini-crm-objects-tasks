@@ -9,6 +9,8 @@ export const STATUS_LABEL: Record<TaskStatus, string> = {
   accepted: 'Принята',
 };
 
+export const COMMENT_REQUIRED = 'Напишите, что нужно исправить: без комментария вернуть нельзя.';
+
 export type Move = {
   to: TaskStatus;
   /** Кто делает: назначенный исполнитель или любой постановщик. */

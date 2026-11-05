@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { ApiError, useDeleteObject, useMe, useObject, useObjectTasks, userMessage, type BoardTask, type ObjectRow } from '@/shared/api';
-import { movesFor, paths, plural } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueryState, Roll, useMoveFlash } from '@/shared/ui';
+import { delay, movesFor, paths, plural } from '@/shared/lib';
+import { DeleteDialog, Icon, NotFoundState, QueryState, ReviewTile, Roll, useMoveFlash } from '@/shared/ui';
 import { ObjectDialog } from './ObjectDialog';
-import { delay, objectStats, ReadyTile, ReviewTile } from './SummaryTiles';
+import { objectStats, ReadyTile } from './SummaryTiles';
 
 function DeleteObjectDialog({ object, tasks, onClose }: { object: ObjectRow; tasks: BoardTask[]; onClose: () => void }) {
   const navigate = useNavigate();

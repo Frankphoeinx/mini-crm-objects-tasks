@@ -9,6 +9,7 @@ export const keys = {
   tasks: ['tasks'] as const,
   board: ['tasks', 'board'] as const,
   task: (id: string) => ['tasks', 'detail', id] as const,
+  allEvents: ['task-events'] as const,
   events: (taskId: string) => ['task-events', taskId] as const,
   objects: ['objects'] as const,
   objectList: ['objects', 'list'] as const,

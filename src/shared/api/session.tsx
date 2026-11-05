@@ -90,6 +90,7 @@ export async function signIn(email: string, password: string): Promise<string | 
 }
 
 export async function signOut(): Promise<boolean> {
-  const { error } = await supabase.auth.signOut();
+  // Демо-учётка одна на всех: выход по умолчанию (global) выкинул бы и других людей под тем же именем.
+  const { error } = await supabase.auth.signOut({ scope: 'local' });
   return !error;
 }

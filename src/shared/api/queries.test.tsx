@@ -8,6 +8,11 @@ import { keys, useBoardTasks, useMyTasks, useMyTurnCount, useObject, useObjects,
 import type { BoardTask, ObjectRow } from './types';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
+const undoSpy = vi.hoisted(() => vi.fn());
+vi.mock('../ui/UndoProvider/UndoProvider', async (original) => {
+  const real = await original<typeof import('../ui/UndoProvider/UndoProvider')>();
+  return { ...real, useUndo: () => undoSpy() ?? real.useUndo() };
+});
 const fake = supabase as unknown as FakeSupabase;
 
 const tasks = [
@@ -185,5 +190,36 @@ describe('мутации', () => {
       await expect(result.current.mutateAsync('t2')).rejects.toThrow('Это действие доступно постановщику');
     });
     expect(queryClient.getQueryData<BoardTask[]>(keys.board)).toHaveLength(5);
+  });
+});
+
+describe('удаление снимает ожидающую смену статуса', () => {
+  function deleting<T>(callback: () => T) {
+    const discard = vi.fn();
+    undoSpy.mockReturnValue({ run: vi.fn(), discard });
+    return { discard, ...hook(callback, manager) };
+  }
+
+  it('задача: снимает её действие', async () => {
+    const { discard, result } = deleting(() => useDeleteTask());
+    await act(() => result.current.mutateAsync('t1'));
+    expect(discard).toHaveBeenCalledWith('t1');
+  });
+
+  it('объект: снимает действия всех его задач', async () => {
+    const { discard, queryClient, result } = deleting(() => useDeleteObject());
+    queryClient.setQueryData(keys.board, tasks);
+    await act(() => result.current.mutateAsync('o1'));
+    expect(discard.mock.calls.flat().sort()).toEqual(['t1', 't2']);
+  });
+
+  it('объект: карточки и история его задач помечены устаревшими', async () => {
+    const { queryClient, result } = deleting(() => useDeleteObject());
+    queryClient.setQueryData(keys.board, tasks);
+    queryClient.setQueryData(keys.task('t1'), tasks[0]);
+    queryClient.setQueryData(keys.events('t1'), []);
+    await act(() => result.current.mutateAsync('o1'));
+    expect(queryClient.getQueryState(keys.task('t1'))?.isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(keys.events('t1'))?.isInvalidated).toBe(true);
   });
 });

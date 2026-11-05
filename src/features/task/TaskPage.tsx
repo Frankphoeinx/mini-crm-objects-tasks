@@ -13,7 +13,7 @@ import {
   type Profile,
 } from '@/shared/api';
 import { isReturned, paths, readTaskFrom } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueryState } from '@/shared/ui';
+import { DeleteDialog, Icon, NotFoundState, QueryState, ReturnedChip } from '@/shared/ui';
 import { EditLine } from './EditLine';
 import { StatusRoute } from './StatusRoute';
 import { TaskActions } from './TaskActions';
@@ -84,12 +84,7 @@ function TaskCard({ task, profiles, objects }: TaskCardProps) {
               <Icon name="back" />
               {back.label}
             </button>
-            {isReturned(task) && (
-              <span className="chip st-rework">
-                <Icon name="rework" />
-                Доработка
-              </span>
-            )}
+            {isReturned(task) && <ReturnedChip />}
             {me.isManager && (
               <div className="tk-manage">
                 <button
