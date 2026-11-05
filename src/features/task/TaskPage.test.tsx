@@ -328,14 +328,14 @@ const BACK_CASES: [TaskFrom | undefined, string, string][] = [
 ];
 
 describe('возврат назад и удаление', () => {
-  it.each(BACK_CASES)('открыта из %s: кнопка «%s» ведёт на %s', async (from, label, path) => {
+  it.each(BACK_CASES)('открыта из %s: ссылка «%s» ведёт на %s', async (from, label, path) => {
     const user = userEvent.setup();
     open({ from });
     await user.click(screen.getByRole('link', { name: label }));
     expect(where()).toBe(path);
   });
 
-  it('список объектов отстал от задачи: кнопка всё равно подписана и ведёт на объект', async () => {
+  it('список объектов отстал от задачи: ссылка всё равно подписана и ведёт на объект', async () => {
     const user = userEvent.setup();
     open({ objects: [] });
     await user.click(screen.getByRole('link', { name: 'Объект' }));
