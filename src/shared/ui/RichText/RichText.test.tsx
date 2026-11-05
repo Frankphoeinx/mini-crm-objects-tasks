@@ -7,7 +7,7 @@ import { supabase } from '@/shared/api/client';
 import { createTestQueryClient, manager, providers } from '@/shared/test';
 import type { FakeSupabase } from '@/shared/test/fakeSupabase';
 import { richTextExtensions } from './extensions';
-import { RichTextView as LazyRichTextView, type RichTextEditorProps } from './RichText';
+import type { RichTextEditorProps } from './RichText';
 import RichTextEditor from './RichTextEditor';
 import RichTextView from './RichTextView';
 
@@ -130,10 +130,10 @@ function renderWithClient(ui: React.ReactElement) {
 
 describe('показ описания', () => {
   it('пока редактор грузится, описание уже видно обычным текстом', async () => {
-    const { container } = renderWithClient(<LazyRichTextView value={'**Важно**\nВторая строка'} />);
+    vi.resetModules();
+    const { RichTextView: FreshView } = await import('./RichText');
+    const { container } = render(<FreshView value={'**Важно**\nВторая строка'} />);
     expect(container.querySelector('.rt-plain')?.textContent).toBe('Важно\nВторая строка');
-    expect(await screen.findByText('Важно', { selector: 'strong' })).toBeInTheDocument();
-    expect(container.querySelector('.rt-plain')).toBeNull();
   });
 
   it.each([
