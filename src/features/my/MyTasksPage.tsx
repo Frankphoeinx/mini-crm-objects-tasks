@@ -1,10 +1,76 @@
-// Заглушка каркаса: WP-4 заменит файл целиком, имя и пропсы менять нельзя.
+import type { CSSProperties } from 'react';
+import { useNavigate } from 'react-router';
+import { useMe, useMyTasks, useMyTurnCount, useObjects, useReviewTasks, type BoardTask, type ObjectRow } from '@/shared/api';
+import { paths } from '@/shared/lib';
+import { Crane, EmptyState, Icon, QueryState, Roll } from '@/shared/ui';
+// Исключение из правила «фичи не импортируют друг друга» (линтер ловит только @/features/*): доска одна на два экрана, а shared и роутер правит другой пакет.
+import { Board } from '../board';
+
+const delay = (d: string) => ({ '--d': d }) as CSSProperties;
+
+function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] }) {
+  const me = useMe();
+  const navigate = useNavigate();
+  const turn = useMyTurnCount();
+  const waiting = useReviewTasks().data?.length ?? 0;
+
+  return (
+    <>
+      <section className="hero is-mine">
+        <div className="tile hero-title w">
+          <h1 className="h1">Мои задачи</h1>
+          <div className="hero-sub">
+            <p className="addr">
+              <span>
+                {me.full_name}, {me.roleLabel}
+              </span>
+            </p>
+            <div className="chips">
+              <span className="chip">
+                <Icon name="new" />
+                <span>Всего: {tasks.length}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <button className="tile t-crane hero-crane lift w" style={delay('25ms')} type="button" onClick={() => navigate(paths.review)}>
+          <Crane />
+          <span className="big-n">
+            <Roll value={waiting} />
+          </span>
+          <span className="big-l">Ждут проверки</span>
+        </button>
+        <div className="hero-side">
+          <div className="tile t-orange w" style={delay('50ms')}>
+            <span className="lbl">Ваш ход</span>
+            <span className="turn-n">
+              <Roll value={turn} />
+            </span>
+            <span className="lbl o-more">Ждут вашего действия</span>
+          </div>
+        </div>
+      </section>
+      {tasks.length === 0 ? (
+        <EmptyState
+          icon="work"
+          title="Вам пока не назначили задач"
+          text="Когда постановщик назначит вас на задачу, она появится здесь."
+          action={
+            <button className="btn is-primary" type="button" onClick={() => navigate(paths.objects)}>
+              К объектам
+            </button>
+          }
+        />
+      ) : (
+        <Board tasks={tasks} from="my" metaOf={(t) => ({ icon: 'pin', text: objects.find((o) => o.id === t.object_id)?.name ?? '' })} />
+      )}
+    </>
+  );
+}
 
 export function MyTasksPage() {
-  return (
-    <div className="tile empty w">
-      <h1 className="h1">Мои задачи</h1>
-      <p>Экран появится на следующем шаге.</p>
-    </div>
-  );
+  const tasks = useMyTasks();
+  const objects = useObjects();
+
+  return <QueryState query={tasks}>{(mine) => <QueryState query={objects}>{(places) => <MyTasks tasks={mine} objects={places} />}</QueryState>}</QueryState>;
 }
