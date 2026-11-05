@@ -62,7 +62,8 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
               onChange={(e) => {
                 setTitle(e.target.value);
                 setTitleMissing(false);
-                create.reset();
+                // Только прошлый отказ: идущий запрос сбрасывать нельзя, иначе окно можно отправить второй раз.
+                if (create.isError) create.reset();
               }}
             />
           </div>

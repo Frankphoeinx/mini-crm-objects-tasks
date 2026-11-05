@@ -364,6 +364,19 @@ describe('Окно создания задачи', () => {
     await waitFor(() => expect(inserted()).toMatchObject({ object_id: 'o2', assignee_id: otherWorker.id }));
   });
 
+  it('ввод во время сохранения не даёт отправить окно второй раз', async () => {
+    let answer: (value: Response) => void = () => {};
+    show([makeTask()]);
+    await userEvent.click(screen.getByRole('button', { name: 'Создать задачу' }));
+    const name = screen.getByLabelText('Название');
+    await userEvent.type(name, 'Новая');
+    fake.from.mockImplementationOnce(() => ({ insert: () => ({ select: () => ({ single: () => new Promise((resolve) => { answer = resolve as typeof answer; }) }) }) }) as never);
+    await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    await userEvent.type(name, ' правка');
+    expect(screen.getByRole('button', { name: 'Сохранить' })).toBeDisabled();
+    answer({ data: makeTask(), error: null, status: 201 } as never);
+  });
+
   it('исправление названия убирает прошлый отказ базы', async () => {
     fake.respond('tasks', refused);
     show([makeTask()]);
