@@ -122,7 +122,7 @@ describe('демо-вход (решение владельца)', () => {
     expect(screen.queryByRole('button', { name: /Анна/ })).not.toBeInTheDocument();
   });
 
-  it('список как в эталоне', () => {
+  it('список как задуман', () => {
     vi.stubEnv('VITE_DEMO_PASSWORD', 'demo-value');
     render(<LoginPage />);
     expect(screen.getByRole('heading', { name: 'Демо-пользователи' })).toBeInTheDocument();

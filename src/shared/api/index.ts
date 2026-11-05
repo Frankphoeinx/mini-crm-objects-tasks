@@ -4,4 +4,5 @@ export { keys, useBoardTasks, useMyTasks, useMyTurnCount, useObject, useObjects,
 export { useCreateObject, useCreateTask, useDeleteObject, useDeleteTask, useUpdateObject, useUpdateTask } from './mutations';
 export { useMoveTask, type MoveOptions } from './moves';
 export { MeProvider, SessionProvider, signIn, signOut, useCurrentProfile, useMe, useSession, type Me } from './session';
+export { TASK_IMAGE_TYPES, uploadTaskImage, useTaskImage } from './taskImages';
 export type { BoardTask, EditField, EventKind, NewObject, NewTask, ObjectRow, Profile, Role, Task, TaskEvent, TaskPatch, TaskStatus } from './types';

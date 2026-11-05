@@ -1,4 +1,4 @@
-// Значки и заготовки рисунков эталона: один раз в корне страницы, дальше ссылки через <use>.
+// Значки и заготовки рисунков: один раз в корне страницы, дальше ссылки через <use>.
 
 export type IconName =
   | 'new'
@@ -14,7 +14,13 @@ export type IconName =
   | 'trash'
   | 'down'
   | 'cal'
-  | 'dial';
+  | 'dial'
+  | 'bold'
+  | 'italic'
+  | 'heading'
+  | 'list'
+  | 'numbered'
+  | 'image';
 
 /** Значок статуса берётся по его ключу: new кирпич, work каска, review рулетка, rework конус, accepted галочка. */
 export function Icon({ name, className }: { name: IconName; className?: string }) {
@@ -43,6 +49,12 @@ export function IconDefs() {
         <g id="i-down"><path d="M6 9l6 6 6-6"></path></g>
         <g id="i-cal"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M8 3v4M16 3v4"></path></g>
         <g id="i-dial"><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="1.5"></circle></g>
+        <g id="i-bold"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zM7 12h7a3.5 3.5 0 0 1 0 7H7z"></path></g>
+        <g id="i-italic"><path d="M10 5h8M6 19h8M14 5l-4 14"></path></g>
+        <g id="i-heading"><path d="M6 5v14M18 5v14M6 12h12"></path></g>
+        <g id="i-list"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></g>
+        <g id="i-numbered"><path d="M10 6h10M10 12h10M10 18h10M4 5l1.5-1v5M4 15a1.5 1.5 0 0 1 3 0c0 1.5-3 2-3 4h3"></path></g>
+        <g id="i-image"><rect x="3" y="5" width="18" height="14" rx="3"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 16l-5-5L6 19"></path></g>
         <g id="crane-mast">
           <path className="cw" d="M398 92V900M422 92V900"></path>
           <path className="cd" d="M398 92L422 116L398 140L422 164L398 188L422 212L398 236L422 260L398 284L422 308L398 332L422 356L398 380L422 404L398 428L422 452L398 476L422 500L398 524L422 548L398 572L422 596L398 620L422 644L398 668L422 692L398 716L422 740L398 764L422 788L398 812L422 836L398 860L422 884"></path>

@@ -56,7 +56,7 @@ describe('formatDateTime', () => {
     expect(formatDateTime(new Date(2026, 10, 5, 9, 5).toISOString(), now)).toBe('сегодня, 09:05');
   });
 
-  it('другой день как в эталоне', () => {
+  it('другой день', () => {
     expect(formatDateTime(new Date(2026, 10, 3, 9, 10).toISOString(), now)).toBe('3 ноября, 09:10');
     expect(formatDateTime(new Date(2026, 9, 30, 18, 0).toISOString(), now)).toBe('30 октября, 18:00');
   });
@@ -76,7 +76,7 @@ describe('люди', () => {
     ['Анна Смирнова', 'manager', 'ava-anna'],
     ['Пётр Иванов', 'worker', 'ava-petr'],
     ['Сергей Козлов', 'worker', 'ava-sergey'],
-  ] as const)('цвет аватарки демо-пользователя %s как в эталоне', (full_name, role, expected) => {
+  ] as const)('цвет аватарки демо-пользователя %s', (full_name, role, expected) => {
     expect(avatarClass({ full_name, role })).toBe(expected);
   });
 });

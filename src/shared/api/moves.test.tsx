@@ -39,7 +39,7 @@ function setup(task: BoardTask, me = worker) {
 
 const advance = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));
 
-describe('useMoveTask: окно отмены на настоящем кэше (AC-12)', () => {
+describe('useMoveTask: окно отмены на настоящем кэше', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     fake.reset();
@@ -174,7 +174,7 @@ describe('useMoveTask: окно отмены на настоящем кэше (A
     expect(t.history()).toEqual([event]);
   });
 
-  it('уход пользователя в окне отмены: статус не меняется (допущение AC-12)', async () => {
+  it('уход пользователя в окне отмены: статус не меняется (допущение из docs/05)', async () => {
     const task = makeTask({ status: 'new' });
     const t = setup(task);
     act(() => t.result.current(task, 'work'));

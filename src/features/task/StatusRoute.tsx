@@ -3,7 +3,7 @@ import { useTaskEvents, type TaskEvent, type TaskStatus } from '@/shared/api';
 import { STATUS_LABEL } from '@/shared/lib';
 import { Icon } from '@/shared/ui';
 
-/** Узлы и линии маршрута считаются по истории, как flag и on в crm-core.js. Создание тоже приводит в «Новую». */
+/** Узлы и линии маршрута считаются по истории. Создание тоже приводит в «Новую». */
 export function routeMarks(status: TaskStatus, events: TaskEvent[]) {
   const reached = new Set<TaskStatus | null>(events.map((e) => e.to_status));
   const passed = new Set(events.map((e) => `${e.from_status}>${e.to_status}`));

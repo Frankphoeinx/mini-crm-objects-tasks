@@ -1,4 +1,4 @@
--- AC-2, AC-3, AC-6: матрица переходов и смена статуса.
+-- Матрица переходов и смена статуса.
 begin;
 select plan(151);
 \ir fixture.psql
@@ -206,7 +206,7 @@ select is(
   null, 'пустой комментарий хранится как NULL'
 );
 
--- Постановщик назначает себя, выполняет и принимает сам (AC-15).
+-- Постановщик назначает себя, выполняет и принимает сам.
 select pg_temp.login('boss');
 update public.tasks set assignee_id = pg_temp.id('boss') where id = pg_temp.id('task-free');
 select is((public.change_task_status(pg_temp.id('task-free'), 'work')).status, 'work'::public.task_status, 'постановщик взял свою задачу');

@@ -22,7 +22,7 @@ export function fullName(profiles: Profile[] | undefined, id: string | null) {
   return profiles?.find((p) => p.id === id)?.full_name ?? UNASSIGNED;
 }
 
-/** Цвет аватарки из палитры эталона. Постоянный для человека; основание 7 выбрано так, чтобы демо-исполнители совпали с эталоном. */
+/** Цвет аватарки из палитры. Постоянный для человека; основание 7 выбрано так, чтобы демо-исполнители совпали с эталоном. */
 export function avatarClass(person: Pick<Profile, 'full_name' | 'role'>) {
   if (person.role === 'manager') return 'ava-anna';
   const sum = [...person.full_name].reduce((total, char) => total + (char.codePointAt(0) ?? 0), 0);

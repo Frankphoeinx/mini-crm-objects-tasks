@@ -56,7 +56,7 @@ describe('строки', () => {
     expect(row('Кровля').style.getPropertyValue('--d')).toBe('25ms');
   });
 
-  it('второй круг: метка «Доработка» и тёплый вид, у первого круга их нет (AC-11)', () => {
+  it('второй круг: метка «Доработка» и тёплый вид, у первого круга их нет', () => {
     renderPage();
     expect(within(row('Кровля')).getByText('Доработка')).toBeInTheDocument();
     expect(row('Кровля')).toHaveClass('is-returned');
@@ -82,10 +82,10 @@ describe('строки', () => {
   });
 });
 
-describe('действия (AC-10)', () => {
+describe('действия', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('постановщик: подписи полные, вид кнопок как в эталоне', () => {
+  it('постановщик: подписи полные, вид кнопок как задуман', () => {
     renderPage();
     const buttons = within(row('Ворота'));
     expect(buttons.getByRole('button', { name: 'Принять' })).toHaveClass('kq', 'is-primary');
@@ -145,7 +145,7 @@ describe('действия (AC-10)', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Задача теперь «На доработке»');
   });
 
-  it('последняя строка ушла, база отказала: окно возврата снова с тем же текстом (AC-18)', async () => {
+  it('последняя строка ушла, база отказала: окно возврата снова с тем же текстом', async () => {
     vi.useFakeTimers();
     fake.respond('change_task_status', { error: { message: 'TypeError: Failed to fetch' }, status: 0 });
     fake.respond('task_board', { data: [first] });
@@ -164,7 +164,7 @@ describe('действия (AC-10)', () => {
   });
 });
 
-describe('состояния (AC-18)', () => {
+describe('состояния', () => {
   it('пусто', () => {
     renderPage({ tasks: [hidden] });
     expect(screen.getByRole('heading', { name: 'Сейчас ничего не ждёт проверки' })).toBeInTheDocument();

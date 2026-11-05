@@ -14,6 +14,7 @@ import { eventText } from './TaskHistory';
 import { TaskPage } from './TaskPage';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
+vi.mock('@/shared/ui/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
 const fake = supabase as unknown as FakeSupabase;
 
 const north = makeObject();
@@ -89,7 +90,7 @@ const where = () => screen.getByTestId('where').textContent;
 
 beforeEach(() => fake.reset());
 
-describe('состояния экрана (AC-18)', () => {
+describe('состояния экрана', () => {
   it('сначала загрузка, затем карточка', async () => {
     fake.respond('task_board', { data: makeTask() });
     mount(createTestQueryClient(), 't1', worker);
@@ -148,7 +149,7 @@ describe('состояния экрана (AC-18)', () => {
   });
 });
 
-describe('показ по роли (AC-8, AC-13)', () => {
+describe('показ по роли', () => {
   it('постановщик: поля, выбор и корзина; h1 остаётся для скринридера', () => {
     open();
     expect(titleField()).toHaveValue('Залить фундамент');
@@ -182,7 +183,7 @@ describe('показ по роли (AC-8, AC-13)', () => {
   });
 });
 
-describe('правка названия и описания (AC-13)', () => {
+describe('правка названия и описания', () => {
   it('название и описание уходят своими правками', async () => {
     const user = userEvent.setup();
     open();
@@ -202,13 +203,13 @@ describe('правка названия и описания (AC-13)', () => {
     expect(titleField()).toHaveValue('Залить фундамент');
   });
 
-  it('отказ базы показан и значение вернулось', async () => {
+  it('отказ базы показан, набранное не пропало и уходит при следующей попытке', async () => {
     const user = userEvent.setup();
     open();
     fake.respond('tasks', refused);
     await user.type(titleField(), ' срочно{Enter}');
     expect(await screen.findByText('Это действие доступно постановщику')).toBeInTheDocument();
-    expect(titleField()).toHaveValue('Залить фундамент');
+    expect(titleField()).toHaveValue('Залить фундамент срочно');
   });
 
   it('после успеха поле показывает данные базы и снова следит за обновлениями', async () => {
@@ -237,7 +238,7 @@ describe('правка названия и описания (AC-13)', () => {
   });
 });
 
-describe('исполнитель и объект через список (AC-13, AC-15)', () => {
+describe('исполнитель и объект через список', () => {
   const trigger = (name: string) => screen.getByRole('button', { name });
   const option = (name: RegExp) => screen.findByRole('option', { name });
 
@@ -326,7 +327,7 @@ const BACK_CASES: [TaskFrom | undefined, string, string][] = [
   [undefined, 'ЖК Северный', '/objects/o1'],
 ];
 
-describe('возврат назад и удаление (AC-8, AC-14)', () => {
+describe('возврат назад и удаление', () => {
   it.each(BACK_CASES)('открыта из %s: кнопка «%s» ведёт на %s', async (from, label, path) => {
     const user = userEvent.setup();
     open({ from });
@@ -371,7 +372,7 @@ describe('возврат назад и удаление (AC-8, AC-14)', () => {
   });
 });
 
-describe('блок действий (AC-8, AC-15, AC-16)', () => {
+describe('блок действий', () => {
   const COMMENT_ANY = 'Комментарий, если нужен';
   const COMMENT_REQUIRED = 'Комментарий. Обязателен при возврате на доработку';
 
@@ -416,7 +417,7 @@ describe('блок действий (AC-8, AC-15, AC-16)', () => {
     last_return_at: '2026-11-04T10:12:00Z',
   };
 
-  it.each(['new', 'work', 'review', 'rework'] as const)('второй круг, статус %s: метка и причина возврата (AC-11, AC-16)', (status) => {
+  it.each(['new', 'work', 'review', 'rework'] as const)('второй круг, статус %s: метка и причина возврата', (status) => {
     const { container } = open({ me: worker, task: makeTask({ status, ...returned }) });
     expect(container.querySelector('.tk-bar .chip.st-rework')).toHaveTextContent('Доработка');
     const why = container.querySelector('.act-why');
@@ -434,7 +435,7 @@ describe('блок действий (AC-8, AC-15, AC-16)', () => {
     expect(container.querySelector('.act-why')).toBeNull();
   });
 
-  describe('смена статуса с окном отмены (AC-12)', () => {
+  describe('смена статуса с окном отмены', () => {
     beforeEach(() => {
       vi.useFakeTimers();
     });
@@ -510,7 +511,7 @@ describe('блок действий (AC-8, AC-15, AC-16)', () => {
       expect(fake.rpc).not.toHaveBeenCalled();
     });
 
-    it('отказ базы: статус откатился, причина показана, комментарий вернулся в поле (AC-18)', async () => {
+    it('отказ базы: статус откатился, причина показана, комментарий вернулся в поле', async () => {
       open({ task: review });
       fake.respond('change_task_status', refused);
       fireEvent.change(commentField(), { target: { value: 'Ворота перекошены' } });
@@ -554,7 +555,7 @@ describe('блок действий (AC-8, AC-15, AC-16)', () => {
   });
 });
 
-describe('история (AC-3, AC-13)', () => {
+describe('история', () => {
   it('запись не пересоздаётся, когда временная строка получает настоящий номер из базы', async () => {
     const { queryClient } = open({ events: [makeEvent({ id: -1, kind: 'status', from_status: 'new', to_status: 'work' })] });
     const before = screen.getByText('Новая → В работе').closest('li');
@@ -598,6 +599,9 @@ describe('история (AC-3, AC-13)', () => {
     ['название', edit('title', 'Старое', 'Новое'), 'Было: Старое Стало: Новое'],
     ['описание добавили', edit('description', '', 'Новое'), 'Стало: Новое'],
     ['описание очистили', edit('description', 'Старое', ''), 'Было: Старое'],
+    ['описание без значков разметки', edit('description', '**Старое**', '## Новое\n- пункт'), 'Было: Старое Стало: Новое пункт'],
+    ['картинка в описании словом', edit('description', 'Схема', 'Схема ![](u/p.png)'), 'Было: Схема Стало: Схема [картинка]'],
+    ['название разметкой не считается', edit('title', '**Старое**', 'Новое'), 'Было: **Старое** Стало: Новое'],
   ])('что было и что стало: %s', (_name, event, text) => {
     const { container } = open({ events: [event] });
     expect(container.querySelector('.ev.is-edit .ev-cmt')).toHaveTextContent(text);
@@ -652,7 +656,7 @@ describe('маршрут статусов', () => {
     expect(node('work')).toBe('next');
   });
 
-  it('разметка как в эталоне: подпись вместо заголовка, узлы и линии с классами', () => {
+  it('разметка: подпись вместо заголовка, узлы и линии с классами', () => {
     const { container } = open({ task: makeTask({ status: 'rework' }), events: [created, toWork, toReview, toRework] });
     const route = screen.getByRole('region', { name: 'Маршрут статусов задачи: сейчас На доработке' });
     expect(within(route).queryByRole('heading')).not.toBeInTheDocument();

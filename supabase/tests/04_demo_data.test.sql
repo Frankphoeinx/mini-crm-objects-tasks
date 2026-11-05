@@ -1,4 +1,4 @@
--- AC-19: демо-данные как в прототипе. Файл читает то, что загрузил db reset.
+-- Демо-данные. Файл читает то, что загрузил db reset.
 begin;
 select plan(13);
 
@@ -42,7 +42,7 @@ select is((select count(*)::int from public.tasks where assignee_id is null), 1,
 select is((select count(*)::int from public.task_events), 27, 'все 27 записей истории');
 select is(
   (select to_char(min(created_at) at time zone interval '+05:00', 'YYYY-MM-DD HH24:MI') from public.task_events),
-  '2026-10-30 09:00', 'первая запись истории как в прототипе'
+  '2026-10-30 09:00', 'первая запись истории'
 );
 select results_eq(
   $$ select old_value, new_value from public.task_events where kind = 'edit' $$,

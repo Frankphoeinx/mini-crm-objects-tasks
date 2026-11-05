@@ -9,6 +9,7 @@ import type { FakeSupabase } from '@/shared/test/fakeSupabase';
 import { ObjectBoard } from './ObjectBoard';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
+vi.mock('@/shared/ui/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
 const fake = supabase as unknown as FakeSupabase;
 
 const objects = [makeObject(), makeObject({ id: 'o2', name: 'Склад на Южной', address: 'ул. Южная, 3' })];
@@ -79,7 +80,7 @@ describe('ObjectBoard: состояния', () => {
   });
 });
 
-describe('ObjectBoard: колонки (AC-9)', () => {
+describe('ObjectBoard: колонки', () => {
   it.each([
     [manager, ['Новая', 'В работе', 'На проверке', 'На доработке', 'Принята']],
     [worker, ['Новая', 'В работе', 'На проверке', 'Принята']],
@@ -235,7 +236,7 @@ describe('ObjectBoard: карточка', () => {
   });
 });
 
-describe('ObjectBoard: «Назначить» (AC-15, AC-16)', () => {
+describe('ObjectBoard: «Назначить»', () => {
   const assignButton = () => within(card('t1')).queryByRole('button', { name: 'Назначить исполнителя' });
 
   it.each<[Profile, string | null, boolean]>([
@@ -274,7 +275,7 @@ describe('ObjectBoard: «Назначить» (AC-15, AC-16)', () => {
   });
 });
 
-describe('Окно создания задачи (AC-14)', () => {
+describe('Окно создания задачи', () => {
   const open = async () => {
     await userEvent.click(document.querySelector('.col-add') as HTMLElement);
     return screen.getByRole('dialog', { name: 'Новая задача' });
@@ -315,6 +316,39 @@ describe('Окно создания задачи (AC-14)', () => {
     expect(inserted()).toEqual({ object_id: 'o1', title: 'Новая стена', description: 'Кирпич', assignee_id: null });
   });
 
+  it.each([
+    ['ровно предел уходит', 5000, true],
+    ['на знак больше: не уходит, введённое на месте, фокус на поле', 5001, false],
+  ])('описание: %s', async (_name, length, sent) => {
+    show([makeTask()]);
+    await open();
+    await userEvent.type(screen.getByLabelText('Название'), 'Стена');
+    fireEvent.change(screen.getByLabelText('Описание'), { target: { value: 'я'.repeat(length) } });
+    await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    if (sent) {
+      await waitFor(() => expect(inserted()).toMatchObject({ description: 'я'.repeat(length) }));
+    } else {
+      expect(inserted()).toBeUndefined();
+      expect(screen.getByLabelText('Описание')).toHaveFocus();
+      expect(screen.getByLabelText('Описание')).toHaveValue('я'.repeat(length));
+    }
+  });
+
+  it('пока грузится картинка, сохранить нельзя: иначе она потеряется', async () => {
+    show([makeTask()]);
+    await open();
+    expect(screen.getByRole('button', { name: 'Сохранить' })).toBeEnabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Начать загрузку' }));
+    expect(screen.getByRole('button', { name: 'Сохранить' })).toBeDisabled();
+  });
+
+  it('подпись поля описания прежняя, подсказка в пустом поле', async () => {
+    show([makeTask()]);
+    await open();
+    expect(screen.getByText('Описание')).toHaveClass('rt-label');
+    expect(screen.getByLabelText('Описание')).toHaveAttribute('placeholder', 'Добавьте описание');
+  });
+
   it('объект и исполнитель выбираются из списка', async () => {
     show([makeTask()]);
     await open();
@@ -328,6 +362,18 @@ describe('Окно создания задачи (AC-14)', () => {
     expect(screen.getByRole('button', { name: 'Исполнитель' })).toHaveTextContent('Сергей Козлов');
     await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
     await waitFor(() => expect(inserted()).toMatchObject({ object_id: 'o2', assignee_id: otherWorker.id }));
+  });
+
+  it('исправление названия убирает прошлый отказ базы', async () => {
+    fake.respond('tasks', refused);
+    show([makeTask()]);
+    await userEvent.click(screen.getByRole('button', { name: 'Создать задачу' }));
+    const name = screen.getByLabelText('Название');
+    await userEvent.type(name, 'Новая');
+    await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent('постановщику');
+    await userEvent.type(name, ' правка');
+    expect(within(screen.getByRole('dialog')).queryByRole('alert')).toBeNull();
   });
 
   it('отказ базы: текст в окне, ввод на месте', async () => {

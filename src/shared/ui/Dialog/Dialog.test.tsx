@@ -95,6 +95,21 @@ describe('Dialog', () => {
     expect(save).toHaveFocus();
   });
 
+  it('из поля с разметкой Tab идёт дальше, а не прыгает на первое поле', () => {
+    render(
+      <Dialog title="Окно" onClose={() => {}}>
+        <input aria-label="Название" />
+        <div role="textbox" aria-label="Описание" contentEditable suppressContentEditableWarning tabIndex={0} />
+        <button type="button">Сохранить</button>
+      </Dialog>,
+    );
+    const field = screen.getByRole('textbox', { name: 'Описание' });
+    field.focus();
+    // true: обработчик окна не вмешался, дальше фокус ведёт браузер.
+    expect(fireEvent.keyDown(field, { key: 'Tab' })).toBe(true);
+    expect(field).toHaveFocus();
+  });
+
   it('фокус на подложке: Tab возвращает его в окно', () => {
     render(<Host />);
     open();

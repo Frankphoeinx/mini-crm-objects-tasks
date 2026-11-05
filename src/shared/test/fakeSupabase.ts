@@ -2,7 +2,7 @@
 // Подключение в тесте: vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
 import { vi } from 'vitest';
 
-export type DbResult = { data: unknown; error: { code?: string; message: string } | null; status: number };
+export type DbResult = { data: unknown; error: { code?: string; message: string; status?: number } | null; status: number };
 type AuthCallback = (event: string, session: { user: { id: string } } | null) => void;
 
 export function createFakeSupabase() {
@@ -30,8 +30,21 @@ export function createFakeSupabase() {
 
   const authListeners = new Set<AuthCallback>();
 
+  /** Запрос к хранилищу виден как calls('storage'), ответ задаёт respond('storage'). */
+  const storageCall = (method: string, data: unknown) =>
+    vi.fn(async (...args: unknown[]) => {
+      log.push({ target: 'storage', method, args });
+      return responses.get('storage') ?? { data, error: null, status: 200 };
+    });
+
   return {
     from: vi.fn((table: string) => chain(table)),
+    storage: {
+      from: vi.fn(() => ({
+        upload: storageCall('upload', { path: 'p' }),
+        download: storageCall('download', new Blob(['x'], { type: 'image/png' })),
+      })),
+    },
     rpc: vi.fn((name: string, args: unknown) => {
       log.push({ target: name, method: 'rpc', args: [args] });
       return chain(name);

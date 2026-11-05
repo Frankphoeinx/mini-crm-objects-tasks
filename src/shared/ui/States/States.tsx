@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { userMessage } from '../../api/errors';
 import { Icon, type IconName } from '../Icons';
 
-// Состояния экрана собраны из плитки .empty эталона: новых стилей нет.
+// Состояния экрана собраны из плитки .empty: новых стилей нет.
 
 export function EmptyState({ icon, title, text, action }: { icon: IconName; title: string; text: string; action?: ReactNode }) {
   return (

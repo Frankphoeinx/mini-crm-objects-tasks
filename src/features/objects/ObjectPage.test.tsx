@@ -110,7 +110,7 @@ describe('шапка', () => {
   });
 });
 
-describe('состояния (AC-18)', () => {
+describe('состояния', () => {
   it('задачи не загрузились: нет ложных нулей и удаления, название и доска на месте', async () => {
     fake.respond('task_board', { data: null, error: { message: 'boom', code: 'XX000' }, status: 500 });
     const queryClient = createTestQueryClient();
@@ -172,7 +172,7 @@ describe('состояния (AC-18)', () => {
   });
 });
 
-describe('правка объекта (AC-14)', () => {
+describe('правка объекта', () => {
   it('поля заполнены, сохранение уходит с id, шапка показывает новое имя', async () => {
     const renamed = { ...object, name: 'ЖК Южный' };
     fake.respond('objects', { data: renamed });
@@ -206,7 +206,7 @@ describe('правка объекта (AC-14)', () => {
   });
 });
 
-describe('удаление объекта (AC-14)', () => {
+describe('удаление объекта', () => {
   it('окно: число задач и их список только этого объекта; после удаления переход на /objects', async () => {
     renderPage();
     await userEvent.click(manage().del as HTMLElement);

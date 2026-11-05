@@ -1,4 +1,4 @@
-// Логика показа статусов из crm-core.js. Здесь только то, что показать: права проверяет база.
+// Логика показа статусов. Здесь только то, что показать: права проверяет база.
 import type { BoardTask, Role, TaskStatus } from '../api/types';
 
 export const STATUS_LABEL: Record<TaskStatus, string> = {
@@ -34,17 +34,17 @@ const MOVES: Record<TaskStatus, Move[]> = {
 
 type Viewer = { id: string; role: Role };
 
-/** Какие переходы показать пользователю (AC-2). Постановщик, назначивший себя, действует и как исполнитель (AC-15). */
+/** Какие переходы показать пользователю. Постановщик, назначивший себя, действует и как исполнитель. */
 export function movesFor(task: Pick<BoardTask, 'status' | 'assignee_id'>, me: Viewer): Move[] {
   return MOVES[task.status].filter((m) => (m.by === 'manager' ? me.role === 'manager' : task.assignee_id === me.id));
 }
 
-/** Кнопка «Назначить» на карточке: только постановщику и только у задачи без исполнителя (AC-15, AC-16). */
+/** Кнопка «Назначить» на карточке: только постановщику и только у задачи без исполнителя. */
 export function canAssign(task: Pick<BoardTask, 'assignee_id'>, me: Pick<Viewer, 'role'>) {
   return me.role === 'manager' && !task.assignee_id;
 }
 
-/** Снять исполнителя совсем можно только у «Новой» (AC-15). */
+/** Снять исполнителя совсем можно только у «Новой». */
 export function canClearAssignee(status: TaskStatus) {
   return status === 'new';
 }
@@ -54,14 +54,14 @@ const COLUMNS: Record<Role, TaskStatus[]> = {
   worker: ['new', 'work', 'review', 'accepted'],
 };
 
-/** У исполнителя нет колонки доработки: задача лежит в «Новой», статус в базе остаётся «На доработке» (AC-9). */
+/** У исполнителя нет колонки доработки: задача лежит в «Новой», статус в базе остаётся «На доработке». */
 export function columnOf(status: TaskStatus, role: Role): TaskStatus {
   return role === 'worker' && status === 'rework' ? 'new' : status;
 }
 
 export type BoardColumn<T> = { key: TaskStatus; label: string; tasks: T[] };
 
-/** Колонки доски для роли. Задача на доработке идёт первой (AC-9). */
+/** Колонки доски для роли. Задача на доработке идёт первой. */
 export function buildBoard<T extends Pick<BoardTask, 'status'>>(tasks: T[], role: Role): BoardColumn<T>[] {
   return COLUMNS[role].map((key) => ({
     key,
@@ -72,7 +72,7 @@ export function buildBoard<T extends Pick<BoardTask, 'status'>>(tasks: T[], role
   }));
 }
 
-/** Второй круг: задачу возвращали и она ещё не принята (AC-11). */
+/** Второй круг: задачу возвращали и она ещё не принята. */
 export function isReturned(task: Pick<BoardTask, 'status' | 'return_count'>) {
   return task.status !== 'accepted' && task.return_count > 0;
 }

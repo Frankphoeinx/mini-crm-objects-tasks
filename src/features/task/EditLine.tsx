@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ComponentProps } from 'react';
 
 type EditLineProps = Omit<ComponentProps<'textarea'>, 'value' | 'onChange' | 'onBlur' | 'onKeyDown' | 'rows'> & {
   value: string;
-  /** Сохранить текст. Промис завершается, когда данные экрана уже свежие, и не падает. */
+  /** Сохранить текст. Промис завершается, когда данные экрана уже свежие, и не падает. false: не сохранено. */
   onSave: (text: string) => Promise<unknown>;
   /** Пустым не сохраняется: поле вернётся к прежнему тексту. */
   required?: boolean;
@@ -32,8 +32,11 @@ export function EditLine({ value, onSave, required = false, oneLine = false, ...
       return;
     }
     // Текст держим до ответа базы, иначе в поле мелькнёт старое. Начатый за это время новый ввод не трогаем.
+    // При отказе черновик остаётся: набранное не пропадёт и уйдёт при следующем выходе из поля.
     setDraft(next);
-    void onSave(next).finally(() => setDraft((current) => (current === next ? null : current)));
+    void onSave(next).then((saved) => {
+      if (saved !== false) setDraft((current) => (current === next ? null : current));
+    });
   }
 
   return (

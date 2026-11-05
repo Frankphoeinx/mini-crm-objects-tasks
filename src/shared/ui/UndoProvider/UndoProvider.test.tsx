@@ -44,7 +44,7 @@ function makeAction<T extends Partial<UndoAction> = object>(fields?: T) {
 const advance = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));
 const undoButton = () => screen.queryByRole('button', { name: 'Отменить' });
 
-describe('UndoProvider (AC-12)', () => {
+describe('UndoProvider', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -308,6 +308,20 @@ describe('UndoProvider (AC-12)', () => {
     vi.mocked(action.apply).mockClear();
     await act(() => queryClient.fetchQuery({ queryKey: ['tasks2'], queryFn: async () => [], staleTime: 0 }));
     expect(action.apply).not.toHaveBeenCalled();
+  });
+
+  it('размонтирование: действие из очереди не уходит в базу от имени следующего пользователя', async () => {
+    const { unmount } = setup();
+    let release: () => void = () => {};
+    const first = makeAction({ commit: vi.fn(() => new Promise<void>((resolve) => { release = resolve; })) });
+    const second = makeAction({ key: 't2' });
+    act(() => run(first));
+    act(() => run(second));
+    await advance(10_000);
+    unmount();
+    await act(async () => release());
+    await advance(0);
+    expect(second.commit).not.toHaveBeenCalled();
   });
 
   it('размонтирование: неотправленное не уходит в базу', async () => {

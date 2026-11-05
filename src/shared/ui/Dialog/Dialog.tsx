@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { portalRoot } from '../portal';
 
 const EXIT_MS = 120;
-const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href]';
+const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href], [contenteditable="true"]';
 
 type DialogProps = {
   title: string;
@@ -17,7 +17,7 @@ type DialogProps = {
 
 /**
  * Окно поверх экрана: фокус внутри, Esc закрывает, после закрытия фокус возвращается на прежнее место.
- * Заголовок и кнопки кладёт родитель, разметка как в эталоне: h2, .row-btns.
+ * Заголовок и кнопки кладёт родитель, разметка: h2, .row-btns.
  */
 export function Dialog({ title, onClose, busy = false, children }: DialogProps) {
   const [closing, setClosing] = useState(false);
