@@ -150,6 +150,14 @@ describe('состояния каркаса', () => {
     expect(screen.getByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
   });
 
+  it('у экрана свой заголовок вкладки', async () => {
+    const { router } = setup('/login');
+    expect(document.title).toBe('Вход · Объекты и задачи');
+    signedIn(worker);
+    await screen.findByRole('navigation', { name: 'Разделы' });
+    expect(pathOf(router)).toBe('/my');
+  });
+
   it('при первом открытии фокус не перепрыгивает шапку, после смены экрана он в начале экрана', async () => {
     const { router } = setup('/objects');
     signedIn(worker);

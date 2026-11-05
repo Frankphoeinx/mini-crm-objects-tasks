@@ -1,6 +1,6 @@
 // Сверка типов сайта с настоящей базой: разойдутся, и упадёт `npm run typecheck`. Файл database.generated.ts создаёт `npm run gen:types`.
 import type { Database as Real } from './database.generated';
-import type { BoardTask, Database, NewObject, NewTask, ObjectRow, Profile, Task, TaskEvent } from './types';
+import type { BoardTask, Database, NewObject, NewTask, ObjectRow, Profile, Task, TaskEvent } from '../lib/types';
 
 type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 type Expect<T extends true> = T;

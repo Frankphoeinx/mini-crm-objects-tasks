@@ -1,10 +1,10 @@
-import { Link, Outlet, ScrollRestoration, useParams, type RouteObject } from 'react-router';
+import { Outlet, ScrollRestoration, useParams, type RouteObject } from 'react-router';
 import { MyTasksPage, ObjectBoard } from '@/features/board';
 import { ObjectPage, ObjectsPage } from '@/features/objects';
 import { ReviewPage } from '@/features/review';
 import { TaskPage } from '@/features/task';
 import { paths } from '@/shared/lib';
-import { NotFoundState } from '@/shared/ui';
+import { NotFoundToObjects } from '@/shared/ui';
 import { AppLayout } from './AppLayout';
 import { CrashScreen } from './CrashScreen';
 import { GuestOnly, HomeRedirect, RequireAuth } from './guards';
@@ -17,18 +17,6 @@ function ObjectRoute() {
 function TaskRoute() {
   const { id = '' } = useParams();
   return <TaskPage key={id} taskId={id} />;
-}
-
-function NotFoundRoute() {
-  return (
-    <NotFoundState
-      action={
-        <Link className="btn is-primary" to={paths.objects}>
-          К объектам
-        </Link>
-      }
-    />
-  );
 }
 
 function RootRoute() {
@@ -58,7 +46,7 @@ export const routes: RouteObject[] = [
               { path: paths.task(':id'), element: <TaskRoute /> },
               { path: paths.my, element: <MyTasksPage /> },
               { path: paths.review, element: <ReviewPage /> },
-              { path: '*', element: <NotFoundRoute /> },
+              { path: '*', element: <NotFoundToObjects /> },
             ],
           },
         ],

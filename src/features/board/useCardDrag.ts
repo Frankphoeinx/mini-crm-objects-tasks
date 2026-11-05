@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import type { BoardTask, Role, TaskStatus } from '@/shared/api';
 import { columnOf, deniedMoveText, type Move } from '@/shared/lib';
-import { useToast } from '@/shared/ui';
+import { useToast } from '@/shared/undo';
 
 type Session = {
   task: BoardTask;

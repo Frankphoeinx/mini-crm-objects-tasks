@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createTestQueryClient, manager, providers } from '@/shared/test';
 import type { FakeSupabase } from '@/shared/test/fakeSupabase';
 import { supabase } from './client';
-import { ApiError } from './errors';
+import { ApiError } from '../lib/errors';
 import { uploadTaskImage, useTaskImage } from './taskImages';
 
 vi.mock('./client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());

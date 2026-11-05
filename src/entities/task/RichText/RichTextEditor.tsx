@@ -1,11 +1,11 @@
 import { EditorContent, useEditor, useEditorState, type ChainedCommands, type Editor } from '@tiptap/react';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { userMessage } from '../../api/errors';
-import { useMe } from '../../api/session';
-import { TASK_IMAGE_TYPES, uploadTaskImage } from '../../api/taskImages';
-import { DESCRIPTION_MAX } from '../../lib/description';
-import { useLeaveGuard } from '../../lib/useLeaveGuard';
-import { Icon, type IconName } from '../Icons';
+import { userMessage } from '@/shared/api';
+import { useMe } from '@/shared/api';
+import { TASK_IMAGE_TYPES, uploadTaskImage } from '@/shared/api';
+import { DESCRIPTION_MAX } from '@/shared/lib';
+import { useLeaveGuard } from '@/shared/lib';
+import { Icon, type IconName } from '@/shared/ui';
 import { richTextExtensions } from './extensions';
 import type { RichTextEditorProps } from './RichText';
 

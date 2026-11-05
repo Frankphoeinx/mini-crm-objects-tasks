@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, type KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import type { ObjectRow, Profile } from '../../api/types';
+import type { ObjectRow, Profile } from '../../lib/types';
 import { ROLE_LABEL } from '../../lib/people';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icons';

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FakeSupabase } from '../test/fakeSupabase';
 import { supabase } from './client';
-import { ApiError } from './errors';
+import { ApiError } from '../lib/errors';
 import { createQueryClient, shouldRetry } from './queryClient';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());

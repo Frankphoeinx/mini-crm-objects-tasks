@@ -5,12 +5,12 @@ import type { FakeSupabase } from '../test/fakeSupabase';
 import { supabase } from './client';
 import { useCreateObject, useCreateTask, useDeleteObject, useDeleteTask, useUpdateObject, useUpdateTask } from './mutations';
 import { keys, useBoardTasks, useMyTasks, useMyTurnCount, useObject, useObjects, useObjectTasks, useProfiles, useReviewTasks, useTask, useTaskEvents } from './queries';
-import type { BoardTask, ObjectRow } from './types';
+import type { BoardTask, ObjectRow } from '../lib/types';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
 const undoSpy = vi.hoisted(() => vi.fn());
-vi.mock('../ui/UndoProvider/UndoProvider', async (original) => {
-  const real = await original<typeof import('../ui/UndoProvider/UndoProvider')>();
+vi.mock('../undo/UndoProvider', async (original) => {
+  const real = await original<typeof import('../undo/UndoProvider')>();
   return { ...real, useUndo: () => undoSpy() ?? real.useUndo() };
 });
 const fake = supabase as unknown as FakeSupabase;

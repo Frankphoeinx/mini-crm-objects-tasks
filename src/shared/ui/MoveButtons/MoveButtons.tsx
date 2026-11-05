@@ -1,4 +1,4 @@
-import type { TaskStatus } from '../../api/types';
+import type { TaskStatus } from '../../lib/types';
 import type { Move } from '../../lib/status';
 
 type MoveButtonsProps = {

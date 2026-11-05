@@ -8,13 +8,13 @@ import { supabase } from '@/shared/api/client';
 import { formatDateTime, taskLinkState, type TaskFrom } from '@/shared/lib';
 import { createTestQueryClient, makeObject, makeTask, manager, otherWorker, worker } from '@/shared/test';
 import type { FakeSupabase } from '@/shared/test/fakeSupabase';
-import { UndoProvider } from '@/shared/ui';
+import { UndoProvider } from '@/shared/undo';
 import { routeMarks } from './StatusRoute';
 import { eventText } from './TaskHistory';
 import { TaskPage } from './TaskPage';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
-vi.mock('@/shared/ui/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
+vi.mock('@/entities/task/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
 const fake = supabase as unknown as FakeSupabase;
 
 const north = makeObject();
@@ -203,12 +203,28 @@ describe('правка названия и описания', () => {
     expect(titleField()).toHaveValue('Залить фундамент');
   });
 
+  it('правка текста идёт с номером версии, смена исполнителя без него', async () => {
+    const user = userEvent.setup();
+    open({ task: makeTask({ text_version: 3 }) });
+    await user.type(titleField(), ' срочно{Enter}');
+    await waitFor(() => expect(fake.calls('tasks').filter((c) => c.method === 'eq').map((c) => c.args)).toContainEqual(['text_version', 3]));
+  });
+
+  it('текст успел изменить другой постановщик: понятный текст, набранное в поле', async () => {
+    const user = userEvent.setup();
+    open();
+    fake.respond('tasks', { data: null, error: { code: 'PGRST116', message: 'no rows' }, status: 406 });
+    await user.type(titleField(), ' срочно{Enter}');
+    expect(await screen.findByRole('status')).toHaveTextContent('только что изменил другой постановщик');
+    expect(titleField()).toHaveValue('Залить фундамент срочно');
+  });
+
   it('отказ базы показан, набранное не пропало и уходит при следующей попытке', async () => {
     const user = userEvent.setup();
     open();
     fake.respond('tasks', refused);
     await user.type(titleField(), ' срочно{Enter}');
-    expect(await screen.findByText('Это действие доступно постановщику')).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Это действие доступно постановщику');
     expect(titleField()).toHaveValue('Залить фундамент срочно');
   });
 
@@ -291,7 +307,7 @@ describe('исполнитель и объект через список', () =>
     fake.respond('tasks', refused);
     await user.click(trigger('Исполнитель: Пётр Иванов'));
     await user.click(await option(/Сергей Козлов/));
-    expect(await screen.findByText('Это действие доступно постановщику')).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Это действие доступно постановщику');
     expect(await screen.findByRole('button', { name: 'Исполнитель: Пётр Иванов' })).toBeInTheDocument();
   });
 
@@ -519,7 +535,7 @@ describe('блок действий', () => {
       expect(within(actions()).queryByRole('textbox')).not.toBeInTheDocument();
 
       await advance(10_050);
-      expect(screen.getByText('Это действие доступно постановщику')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('Это действие доступно постановщику');
       expect(within(actions()).getByText('На проверке')).toHaveClass('act-st');
       expect(commentField()).toHaveValue('Ворота перекошены');
     });

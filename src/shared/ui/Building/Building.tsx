@@ -1,3 +1,4 @@
+import { cx } from '../../lib/format';
 import type { CSSProperties } from 'react';
 import { Icon } from '../Icons';
 
@@ -19,7 +20,7 @@ export function floorsOf(total: number, accepted: number, flash = false): Floor[
 }
 
 function floorClass(floor: Floor) {
-  return ['fl', floor.full && 'is-full', floor.ghost && 'is-ghost', floor.flash && 'is-flash'].filter(Boolean).join(' ');
+  return cx('fl', floor.full && 'is-full', floor.ghost && 'is-ghost', floor.flash && 'is-flash');
 }
 
 /**

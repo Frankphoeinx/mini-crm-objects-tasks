@@ -1,4 +1,4 @@
-import type { TaskStatus } from '../../api/types';
+import type { TaskStatus } from '../../lib/types';
 import { Icon } from '../Icons';
 import { Dialog } from './Dialog';
 

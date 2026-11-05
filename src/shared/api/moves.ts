@@ -1,12 +1,12 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { STATUS_LABEL } from '../lib/status';
-import { useUndo } from '../ui/UndoProvider/UndoProvider';
+import { useUndo } from '../undo/UndoProvider';
 import { supabase } from './client';
-import { unwrap } from './errors';
+import { unwrap } from '../lib/errors';
 import { keys } from './queries';
 import { useMe } from './session';
-import type { BoardTask, TaskEvent, TaskStatus } from './types';
+import type { BoardTask, TaskEvent, TaskStatus } from '../lib/types';
 
 function patchTask(queryClient: QueryClient, id: string, fields: Partial<BoardTask>) {
   queryClient.setQueryData<BoardTask[]>(keys.board, (rows) =>

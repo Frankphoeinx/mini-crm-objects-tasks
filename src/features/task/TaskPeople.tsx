@@ -63,7 +63,7 @@ type TaskPeopleProps = { task: BoardTask; profiles: Profile[]; objects: ObjectRo
 /** «Люди и даты»: постановщик меняет исполнителя и объект на месте, остальным это просто текст. */
 export function TaskPeople({ task, profiles, objects }: TaskPeopleProps) {
   const me = useMe();
-  const { save, pending } = useSaveTask(task.id);
+  const { save, pending } = useSaveTask(task);
   const shown = { ...task, ...pending };
   const assignee = fullName(profiles, shown.assignee_id);
   const place = objects.find((o) => o.id === shown.object_id)?.name ?? '';

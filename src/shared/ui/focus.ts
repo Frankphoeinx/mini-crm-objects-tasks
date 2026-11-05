@@ -5,8 +5,10 @@ export const FOCUS_DELAY_MS = 50;
 export function focusTask(taskId: string) {
   if (document.activeElement && document.activeElement !== document.body) return;
   const target =
-    document.querySelector<HTMLElement>(`[data-card="${taskId}"] .kopen`) ??
-    document.querySelector<HTMLElement>('.tk-act .btn') ??
+    document.querySelector<HTMLElement>(`[data-card="${taskId}"] a`) ??
+    document.querySelector<HTMLElement>('[data-after-move]') ??
     document.querySelector<HTMLElement>('main');
   target?.focus({ preventScroll: true });
+  // С клавиатуры фокус должен быть виден. Мышью и касанием экран не дёргаем.
+  if (target?.matches(':focus-visible')) target.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
 }

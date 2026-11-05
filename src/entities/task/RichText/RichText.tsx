@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react';
-import { plainText } from '../../lib/description';
+import { plainText } from '@/shared/lib';
 
 export type RichTextEditorProps = {
   /** Markdown из базы или состояния окна. */

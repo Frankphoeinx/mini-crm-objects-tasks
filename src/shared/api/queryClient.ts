@@ -1,6 +1,6 @@
 import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 import { supabase } from './client';
-import { ApiError } from './errors';
+import { ApiError } from '../lib/errors';
 
 /** Повторяем только сеть и 5xx: отказ базы и 4xx повтором не лечатся. */
 export function shouldRetry(failureCount: number, error: unknown) {

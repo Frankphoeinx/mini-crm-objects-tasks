@@ -1,8 +1,7 @@
 import type { CSSProperties, DragEvent } from 'react';
-import { Link } from 'react-router';
 import type { BoardTask, TaskStatus } from '@/shared/api';
-import { isReturned, type Move } from '@/shared/lib';
-import { Icon, MoveButtons, ReturnedChip, type IconName } from '@/shared/ui';
+import { cx, isReturned, type Move, type TaskFrom } from '@/shared/lib';
+import { Icon, MoveButtons, ReturnedChip, TaskLink, type IconName } from '@/shared/ui';
 
 export type CardMeta = { icon: IconName; text: string };
 
@@ -17,9 +16,8 @@ type BoardCardProps = {
   dragging: boolean;
   landed: boolean;
   dragProps: { onDragStart(e: DragEvent): void; onDragEnd(e: DragEvent): void };
-  /** Адрес страницы задачи и откуда на неё пришли. */
-  to: string;
-  linkState: unknown;
+  /** Откуда открывается задача: от этого зависит кнопка «назад». */
+  from: TaskFrom;
   onMove: (move: Move) => void;
   /** Наведение на кнопку подсвечивает колонку-цель. */
   onTarget: (to: TaskStatus | null) => void;
@@ -28,11 +26,7 @@ type BoardCardProps = {
   assignBusy: boolean;
 };
 
-export function cx(...names: (string | false)[]) {
-  return names.filter(Boolean).join(' ');
-}
-
-export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, dragProps, to, linkState, onMove, onTarget, onAssign, assignBusy }: BoardCardProps) {
+export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, dragProps, from, onMove, onTarget, onAssign, assignBusy }: BoardCardProps) {
   const needsMe = moves.length > 0;
   const returned = isReturned(task);
   return (
@@ -58,12 +52,7 @@ export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, d
           <path d="M10 0V14M6 14h8l-1 4H7zM10 18v3a4.5 4.5 0 1 1-4.5 4.5"></path>
         </svg>
       )}
-      {/* draggable: тянется вся карточка, а не ссылка. */}
-      <Link className="kopen" to={to} state={linkState} draggable={false}>
-        <span className="vt" style={{ display: 'block', viewTransitionName: `floor-${task.id}` }}>
-          {task.title}
-        </span>
-      </Link>
+      <TaskLink id={task.id} title={task.title} from={from} />
       <span className="kmeta">
         <Icon name={meta.icon} />
         {meta.text}

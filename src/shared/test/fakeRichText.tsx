@@ -1,7 +1,7 @@
 // Простое поле вместо настоящего редактора в тестах экранов: они проверяют экран, а редактор проверен в RichText.test.tsx.
-// Подключение в тесте: vi.mock('@/shared/ui/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
+// Подключение в тесте: vi.mock('@/entities/task/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
 import { useState } from 'react';
-import type { RichTextEditorProps } from '../ui/RichText';
+import type { RichTextEditorProps } from '@/entities/task/RichText';
 
 function FakeEditor({ value, onChange, onSave, onUploadingChange, ariaLabel, placeholder }: RichTextEditorProps) {
   const [draft, setDraft] = useState<string | null>(null);

@@ -18,7 +18,7 @@ describe('появление редактора', () => {
     });
     Object.defineProperty(document, 'startViewTransition', { value: start, configurable: true });
     vi.resetModules();
-    const { createTestQueryClient, manager, providers } = await import('../../test');
+    const { createTestQueryClient, manager, providers } = await import('@/shared/test');
     const { RichTextEditor } = await import('./RichText');
     const Wrapper = providers({ me: manager, queryClient: createTestQueryClient() });
     render(

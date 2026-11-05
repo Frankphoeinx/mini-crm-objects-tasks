@@ -1,5 +1,5 @@
 // Логика показа статусов. Здесь только то, что показать: права проверяет база.
-import type { BoardTask, Role, TaskStatus } from '../api/types';
+import type { BoardTask, Role, TaskStatus } from './types';
 
 export const STATUS_LABEL: Record<TaskStatus, string> = {
   new: 'Новая',

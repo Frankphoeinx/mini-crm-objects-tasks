@@ -1,11 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, use, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { userMessage } from '../../api/errors';
-import { useLeaveGuard } from '../../lib/useLeaveGuard';
-import { FOCUS_DELAY_MS, focusTask } from '../focus';
-import { portalRoot } from '../portal';
-import { Toast } from '../Toast';
+import { userMessage } from '../lib/errors';
+import { useLeaveGuard } from '../lib/useLeaveGuard';
+import { FOCUS_DELAY_MS, focusTask, portalRoot, Toast } from '../ui';
 import { createUndoStore, type MoveFlash, type UndoStore } from './undoStore';
 
 const UndoContext = createContext<UndoStore | null>(null);
@@ -24,6 +22,8 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [store] = useState(() => createUndoStore(userMessage));
   const { undo, toast, flash } = useSyncExternalStore(store.subscribe, store.getSnapshot);
+
+  const announcement = [undo?.text, toast].filter(Boolean).join('. ');
 
   useEffect(() => store.dispose, [store]);
   // Смена статуса уходит в базу после окна отмены: закрытие вкладки её снимет, поэтому браузер спросит.
@@ -49,12 +49,16 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   return (
     <UndoContext value={store}>
       {children}
+      {/* Область живёт постоянно и вне портала: иначе диктор может пропустить текст, появившийся вместе с ней. */}
+      <div className="sr" aria-live="polite" aria-atomic="true" role={announcement ? 'status' : undefined}>
+        {announcement}
+      </div>
       {(undo || toast) &&
         createPortal(
           <>
             {undo && (
-              <div className="toast undo" role="status">
-                <span>{undo.text}</span>
+              <div className="toast undo">
+                <span aria-hidden="true">{undo.text}</span>
                 <button className="undo-btn" type="button" onClick={store.undo}>
                   Отменить
                 </button>

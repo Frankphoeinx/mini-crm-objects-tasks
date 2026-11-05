@@ -90,6 +90,7 @@ export function TaskActions({ task, profiles }: { task: BoardTask; profiles: Pro
                 key={move.to}
                 className={`btn ${move.danger ? 'is-danger' : 'is-primary'}`}
                 type="button"
+                data-after-move
                 // На месте нажатой кнопки сразу появляется следующая: второй щелчок двойного нажатия не должен сменить статус ещё раз.
                 onClick={(e) => {
                   if (e.detail < 2) run(move);

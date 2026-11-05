@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useBoardTasks, useMe, useMyTurnCount, useObjects, type BoardTask, type ObjectRow } from '@/shared/api';
-import { delay, paths, percent, plural, ratio, waveDelay } from '@/shared/lib';
-import { Building, Icon, QueriesState, ReviewTile, Roll, Tape } from '@/shared/ui';
+import { delay, paths, percent, plural, ratio, waveDelay, usePageTitle } from '@/shared/lib';
+import { Building, Icon, QueriesState, ReviewTile, Tape, TurnTile } from '@/shared/ui';
 import { ObjectDialog } from './ObjectDialog';
 import { objectStats, ReadyTile } from './SummaryTiles';
 
@@ -59,15 +59,7 @@ function ObjectsContent({ objects, tasks }: { objects: ObjectRow[]; tasks: Board
     <>
       <div className="sum">
         {!me.isManager && (
-          <Link className="tile t-orange lift w" to={paths.my}>
-            <span className="lbl">Ваш ход</span>
-            <span className="turn-n">
-              <Roll value={turn} />
-            </span>
-            <span className="o-title o-more" style={{ marginTop: 0 }}>
-              Открыть мои задачи
-            </span>
-          </Link>
+          <TurnTile turn={turn} link />
         )}
         <ReviewTile waiting={summary.waiting} />
         <ReadyTile total={summary.count} accepted={summary.accepted} />
@@ -105,6 +97,7 @@ function ObjectsContent({ objects, tasks }: { objects: ObjectRow[]; tasks: Board
 }
 
 export function ObjectsPage() {
+  usePageTitle('Объекты');
   const objects = useObjects();
   const tasks = useBoardTasks();
   return (
