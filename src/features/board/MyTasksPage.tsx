@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { useMe, useMyTasks, useMyTurnCount, useObjects, useReviewTasks, type BoardTask, type ObjectRow } from '@/shared/api';
+import { useMe, useMyTasks, useMyTurnCount, useObjects, useProfiles, useReviewTasks, type BoardTask, type ObjectRow } from '@/shared/api';
 import { delay, paths } from '@/shared/lib';
 import { EmptyState, Icon, QueryState, ReviewTile, Roll } from '@/shared/ui';
 import { Board } from './Board';
@@ -61,6 +61,8 @@ function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] 
 export function MyTasksPage() {
   const tasks = useMyTasks();
   const objects = useObjects();
+  // Здесь имена не нужны, но без них первое открытие задачи покажет загрузку вместо полёта заголовка.
+  useProfiles();
 
   return <QueryState query={tasks}>{(mine) => <QueryState query={objects}>{(places) => <MyTasks tasks={mine} objects={places} />}</QueryState>}</QueryState>;
 }

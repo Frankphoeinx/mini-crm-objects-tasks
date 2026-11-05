@@ -56,7 +56,15 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
 
   const drag = useCardDrag(tasks, me.role, move);
   const columns = buildBoard(tasks, me.role);
-  const boardRef = useCardFlip(columns.map((col) => col.tasks.map((t) => t.id).join()).join('|'));
+  const layout = columns.map((col) => col.tasks.map((t) => t.id).join()).join('|');
+  const boardRef = useCardFlip(layout);
+
+  // Окно возврата отдаёт фокус кнопке, которая тут же уезжает с карточкой: blur с неё не придёт.
+  const [targetLayout, setTargetLayout] = useState(layout);
+  if (layout !== targetLayout) {
+    setTargetLayout(layout);
+    setTarget(null);
+  }
 
   return (
     <div className="tile board-tile w" style={{ '--d': '50ms' } as CSSProperties}>

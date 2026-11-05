@@ -209,6 +209,24 @@ describe('ObjectBoard: карточка', () => {
     expect(await screen.findByRole('button', { name: 'Отменить' })).toBeInTheDocument();
   });
 
+  it('после возврата колонка не остаётся подсвеченной: окно вернуло фокус на кнопку, которая уехала', async () => {
+    show([makeTask({ status: 'review' })]);
+    const send = within(card('t1')).getByRole('button', { name: 'Вернуть на доработку' });
+    send.focus();
+    await userEvent.click(send);
+    await userEvent.type(screen.getByLabelText('Что нужно исправить'), 'Нет акта');
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Вернуть' }));
+
+    expect(await screen.findByRole('button', { name: 'Отменить' })).toBeInTheDocument();
+    await waitFor(() => expect(titles('rework')).toEqual(['Залить фундамент']));
+    expect(col('rework')).not.toHaveClass('is-target');
+
+    fake.respond('task_board', { data: [makeTask({ status: 'review' })] });
+    await userEvent.click(screen.getByRole('button', { name: 'Отменить' }));
+    await waitFor(() => expect(titles('review')).toEqual(['Залить фундамент']));
+    expect(col('rework')).not.toHaveClass('is-target');
+  });
+
   it('«Вернуть» сначала спрашивает причину, статус пока прежний', async () => {
     show([makeTask({ status: 'review' })]);
     await userEvent.click(within(card('t1')).getByRole('button', { name: 'Вернуть на доработку' }));

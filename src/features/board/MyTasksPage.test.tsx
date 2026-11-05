@@ -127,3 +127,10 @@ describe('MyTasksPage: состояния', () => {
     expect(await screen.findByRole('heading', { name: 'Мои задачи' })).toBeInTheDocument();
   });
 });
+
+describe('MyTasksPage: подготовка карточки задачи', () => {
+  it('имена загружаются заранее: при первом открытии задачи заголовок не сменится загрузкой', () => {
+    renderScreen(<MyTasksPage />, { me: worker, tasks: [makeTask({ assignee_id: worker.id })], objects });
+    expect(fake.from).toHaveBeenCalledWith('profiles');
+  });
+});

@@ -4,9 +4,9 @@
 
 do $$
 declare
-  anna uuid := (select id from auth.users where email = 'anna@stroyka.test');
-  petr uuid := (select id from auth.users where email = 'petr@stroyka.test');
-  sergey uuid := (select id from auth.users where email = 'sergey@stroyka.test');
+  anna uuid := (select u.id from auth.users u join public.profiles p on p.id = u.id where u.email = 'anna@stroyka.test');
+  petr uuid := (select u.id from auth.users u join public.profiles p on p.id = u.id where u.email = 'petr@stroyka.test');
+  sergey uuid := (select u.id from auth.users u join public.profiles p on p.id = u.id where u.email = 'sergey@stroyka.test');
 begin
   if anna is null or petr is null or sergey is null then
     raise exception 'Нет демо-пользователей: сначала запустите scripts/seed-users.mjs';

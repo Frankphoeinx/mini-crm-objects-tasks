@@ -17,7 +17,7 @@
 
 ## Как запустить локально
 
-Нужны Node.js 24 или новее и Docker. Supabase CLI отдельно ставить не надо: `npx supabase` скачает его при первом вызове. Работа шла на версии 3.0.0.
+Нужны Node.js 24 и Docker. Supabase CLI отдельно ставить не надо: `npx supabase` скачает его при первом вызове. Работа шла на версии 3.0.0.
 
 Сначала установите зависимости и создайте файл настроек:
 
@@ -49,6 +49,7 @@ npm run dev
 | `20261105120100_objects_and_tasks.sql` | объекты, задачи, права, RLS, триггеры записи |
 | `20261105120200_task_events.sql` | история, её неизменность, вид `task_board` |
 | `20261105120300_task_functions.sql` | смена статуса и удаление |
+| `20261105120400_lock_demo_users.sql` | запрет менять пароль и почту демо-пользователей |
 
 Локальная база, только контейнер, без входа и API:
 
@@ -61,10 +62,21 @@ npx supabase db reset
 
 Облачный проект, порядок шагов обязателен:
 
-1. `npx supabase link`, затем `npx supabase db push` без флага `--include-seed`. Файл `seed.sql` вставляет записи в `auth.users`, на облачной базе его запускать нельзя.
-2. Задать в окружении `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `DEMO_PASSWORD` и выполнить `node scripts/seed-users.mjs`. Скрипт создаст трёх пользователей и их профили.
-3. Выполнить `supabase/demo-data.sql` от роли `postgres`. Повторный запуск ничего не меняет.
-4. Закрыть регистрацию в настройках проекта: `[auth] enable_signup = false` из `supabase/config.toml` миграциями не применяется.
+```bash
+npx supabase login
+npx supabase link --project-ref <ref-проекта>
+npx supabase db push --remote --yes
+SUPABASE_URL=... SUPABASE_SECRET_KEY=... DEMO_PASSWORD=... node scripts/seed-users.mjs
+npx supabase db query --remote --yes --file supabase/demo-data.sql
+npx supabase config push --yes
+```
+
+Команды проверены на Supabase CLI 3.0.0. Что делает каждая:
+
+1. `db push` применяет миграции к облачному проекту. Без `--remote` команда пойдёт в локальную базу. Флаг `--include-seed` не нужен: `seed.sql` вставляет записи в `auth.users`, на облачной базе его запускать нельзя.
+2. `seed-users.mjs` создаёт трёх пользователей и их профили. Повторный запуск обновит профили, заданный пароль останется прежним: сменить его можно только новой миграцией, которая снимает запрет.
+3. `db query` загружает демо-данные. Повторный запуск ничего не меняет.
+4. `config push` закрывает регистрацию: `[auth] enable_signup = false` из `supabase/config.toml` миграциями не применяется.
 
 ## Тесты и проверки
 
@@ -85,7 +97,7 @@ npx supabase test db
 npx supabase db lint --fail-on warning
 ```
 
-В тестах базы 351 проверка. Что они доказывают, написано в [docs/04-baza.md](docs/04-baza.md).
+В тестах базы 357 проверок. Что они доказывают, написано в [docs/04-baza.md](docs/04-baza.md).
 
 ## Переменные окружения
 
@@ -99,6 +111,12 @@ npx supabase db lint --fail-on warning
 | `SUPABASE_URL` | `scripts/seed-users.mjs` | адрес проекта Supabase |
 | `SUPABASE_SECRET_KEY` | `scripts/seed-users.mjs` | секретный ключ, на сайт он не попадает |
 | `DEMO_PASSWORD` | `scripts/seed-users.mjs` | пароль, который получат демо-пользователи |
+
+## Откат
+
+- Сайт: `vercel rollback <адрес выкладки>`. Смена переменных `VITE_*` требует новой сборки.
+- База: новая миграция вперёд. Откат миграций стирает данные и историю, поэтому без резервной копии его не делаем.
+- Запрет менять пароль демо-пользователей снимает `drop trigger demo_users_locked on auth.users`, данные это не затрагивает.
 
 ## Что где лежит
 

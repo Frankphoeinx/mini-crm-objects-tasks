@@ -36,8 +36,8 @@ for (const { email, full_name, role } of USERS) {
   const { data, error } = existing
     ? await admin.auth.admin.updateUserById(existing.id, attributes)
     : await admin.auth.admin.createUser(attributes);
-  // Заданный пароль демо-пользователя база менять не даёт (20261105120400_lock_demo_users.sql): профиль всё равно обновляем.
-  if (error && !existing) fail(email, error);
+  // Заданный пароль демо-пользователя база менять не даёт (20261105120400_lock_demo_users.sql), сервис входа отвечает 500: профиль всё равно обновляем.
+  if (error && !(existing && error.status === 500)) fail(email, error);
 
   // Роль только в таблице profiles, не в метаданных пользователя.
   const { error: profileError } = await admin.from('profiles').upsert({ id: existing?.id ?? data.user.id, full_name, role });

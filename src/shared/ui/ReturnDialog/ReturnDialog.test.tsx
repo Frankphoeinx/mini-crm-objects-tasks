@@ -15,12 +15,14 @@ describe('ReturnDialog', () => {
   it('пустой комментарий не отправляется, ошибка связана с полем', () => {
     const onConfirm = vi.fn();
     render(<ReturnDialog taskTitle="Ворота" onConfirm={onConfirm} onClose={() => {}} />);
+    screen.getByRole('button', { name: 'Вернуть' }).focus();
     fireEvent.click(screen.getByRole('button', { name: 'Вернуть' }));
 
     expect(onConfirm).not.toHaveBeenCalled();
     expect(screen.getByRole('alert')).toHaveTextContent('Напишите, что нужно исправить: без комментария вернуть нельзя.');
     expect(screen.getByLabelText('Что нужно исправить')).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByLabelText('Что нужно исправить')).toHaveAttribute('aria-describedby', 'bs-rcomment-err');
+    expect(screen.getByLabelText('Что нужно исправить')).toHaveFocus();
   });
 
   it.each(['   ', '\n\t'])('пробелы не считаются комментарием: %j', (text) => {
