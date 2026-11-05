@@ -56,7 +56,7 @@ export function UndoProvider({ children }: { children: ReactNode }) {
       {(undo || toast) &&
         createPortal(
           <>
-                        {undo && (
+            {undo && (
               <div className="toast undo">
                 <span aria-hidden="true">{undo.text}</span>
                 <button className="undo-btn" type="button" onClick={store.undo}>
