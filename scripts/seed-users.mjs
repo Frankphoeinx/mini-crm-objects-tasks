@@ -1,4 +1,4 @@
-// Создаёт или обновляет трёх демо-пользователей и их профили. Запускать один раз перед supabase/demo-data.sql.
+// Создаёт трёх демо-пользователей и обновляет их профили. Запускать перед supabase/demo-data.sql.
 // Значения только из окружения: SUPABASE_URL, SUPABASE_SECRET_KEY, DEMO_PASSWORD. В вывод они не попадают.
 import { createClient } from '@supabase/supabase-js';
 
@@ -36,11 +36,12 @@ for (const { email, full_name, role } of USERS) {
   const { data, error } = existing
     ? await admin.auth.admin.updateUserById(existing.id, attributes)
     : await admin.auth.admin.createUser(attributes);
-  if (error) fail(email, error);
+  // Заданный пароль демо-пользователя база менять не даёт (20261105120400_lock_demo_users.sql): профиль всё равно обновляем.
+  if (error && !existing) fail(email, error);
 
   // Роль только в таблице profiles, не в метаданных пользователя.
-  const { error: profileError } = await admin.from('profiles').upsert({ id: data.user.id, full_name, role });
+  const { error: profileError } = await admin.from('profiles').upsert({ id: existing?.id ?? data.user.id, full_name, role });
   if (profileError) fail(`${email}, профиль`, profileError);
 
-  console.log(`${email}: ${existing ? 'обновлён' : 'создан'}`);
+  console.log(`${email}: ${existing ? 'обновлён' : 'создан'}${error ? ', пароль прежний' : ''}`);
 }
