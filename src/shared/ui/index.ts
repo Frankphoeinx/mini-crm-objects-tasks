@@ -9,6 +9,7 @@ export { PORTAL_ROOT_ID } from './portal';
 export { ReturnedChip } from './ReturnedChip';
 export { ReturnDialog, useRequestMove } from './ReturnDialog';
 export { ReviewTile } from './ReviewTile';
+export { RichTextEditor, RichTextView } from './RichText';
 export { Roll } from './Roll';
 export { EmptyState, ErrorState, LoadingState, NotFoundState, QueryState } from './States';
 export { Tape } from './Tape';

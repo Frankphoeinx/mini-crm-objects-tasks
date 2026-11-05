@@ -6,7 +6,7 @@ const anna = { id: 'anna', role: 'manager' as const };
 const petr = { id: 'petr', role: 'worker' as const };
 const sergey = { id: 'sergey', role: 'worker' as const };
 
-describe('movesFor: какие действия показать (AC-2, AC-15)', () => {
+describe('movesFor: какие действия показать', () => {
   it.each<[TaskStatus, string | null, { id: string; role: Role }, TaskStatus[]]>([
     // Назначенный исполнитель ведёт задачу до проверки и забирает с доработки.
     ['new', 'petr', petr, ['work']],
@@ -46,7 +46,7 @@ describe('movesFor: какие действия показать (AC-2, AC-15)',
   });
 });
 
-describe('назначение (AC-15, AC-16)', () => {
+describe('назначение', () => {
   it.each<[string | null, Role, boolean]>([
     [null, 'manager', true],
     [null, 'worker', false],
@@ -66,7 +66,7 @@ describe('назначение (AC-15, AC-16)', () => {
   });
 });
 
-describe('колонки доски (AC-9)', () => {
+describe('колонки доски', () => {
   it.each<[TaskStatus, Role, TaskStatus]>([
     ['new', 'manager', 'new'],
     ['work', 'manager', 'work'],
@@ -109,7 +109,7 @@ describe('колонки доски (AC-9)', () => {
   });
 });
 
-describe('второй круг (AC-11)', () => {
+describe('второй круг', () => {
   it.each<[TaskStatus, number, boolean]>([
     ['new', 1, true],
     ['work', 1, true],

@@ -16,7 +16,7 @@ function heldSave() {
   return { save, answer: () => act(async () => answer()) };
 }
 
-describe('EditLine: правка на месте (AC-13)', () => {
+describe('EditLine: правка на месте', () => {
   it('сохраняет при уходе из поля, без пробелов по краям', async () => {
     const t = setup();
     await t.user.clear(t.field);

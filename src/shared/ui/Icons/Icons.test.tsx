@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { expect, it } from 'vitest';
 import { Icon, IconDefs, type IconName } from './Icons';
 
-const NAMES: IconName[] = ['new', 'work', 'review', 'rework', 'accepted', 'crane', 'pin', 'plus', 'back', 'pen', 'trash', 'down', 'cal', 'dial'];
+const NAMES: IconName[] = ['new', 'work', 'review', 'rework', 'accepted', 'crane', 'pin', 'plus', 'back', 'pen', 'trash', 'down', 'cal', 'dial', 'bold', 'italic', 'heading', 'list', 'numbered', 'image'];
 
 it.each(NAMES)('значок %s есть в заготовках', (name) => {
   render(

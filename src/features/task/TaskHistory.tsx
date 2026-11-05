@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { useTaskEvents, type Profile, type TaskEvent, type TaskStatus } from '@/shared/api';
-import { formatDateTime, fullName, STATUS_LABEL, waveDelay } from '@/shared/lib';
+import { formatDateTime, fullName, plainText, STATUS_LABEL, waveDelay } from '@/shared/lib';
 import { ErrorState, LoadingState, useMoveFlash } from '@/shared/ui';
 
 const statusText = (status: TaskStatus | null) => (status ? STATUS_LABEL[status] : '');
@@ -25,10 +25,12 @@ export function eventText(event: TaskEvent) {
 function EditDiff({ event }: { event: TaskEvent }) {
   if (event.field !== 'title' && event.field !== 'description') return null;
   if (!event.old_value && !event.new_value) return null;
+  // Описание хранится в Markdown, а человеку нужен текст.
+  const show = event.field === 'description' ? plainText : (text: string) => text;
   return (
     <p className="ev-cmt" style={{ whiteSpace: 'pre-wrap' }}>
-      {event.old_value && `Было: ${event.old_value}\n`}
-      {event.new_value && `Стало: ${event.new_value}`}
+      {event.old_value && `Было: ${show(event.old_value)}\n`}
+      {event.new_value && `Стало: ${show(event.new_value)}`}
     </p>
   );
 }

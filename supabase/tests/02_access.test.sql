@@ -1,4 +1,4 @@
--- AC-4, AC-5, AC-6, AC-7: кто что читает и пишет под ролью, а не в интерфейсе.
+-- Кто что читает и пишет под ролью, а не в интерфейсе.
 begin;
 select plan(97);
 \ir fixture.psql
@@ -33,7 +33,7 @@ select results_eq(
   $$ select p.proname::text collate "default" from pg_proc p
      where p.pronamespace = 'private'::regnamespace and has_function_privilege('authenticated', p.oid, 'execute')
      order by 1 $$,
-  $$ values ('is_manager'), ('my_object_ids') $$,
+  $$ values ('is_manager'), ('my_object_ids'), ('task_images_count') $$,
   'вошедшему из private доступны только хелперы политик'
 );
 select results_eq(

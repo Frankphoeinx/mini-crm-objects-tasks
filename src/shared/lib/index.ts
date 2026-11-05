@@ -1,3 +1,4 @@
+export { DESCRIPTION_MAX, plainText } from './description';
 export { delay, formatDateTime, percent, plural, ratio, waveDelay } from './format';
 export { fullName, ROLE_LABEL, shortName, UNASSIGNED } from './people';
 export { paths, readTaskFrom, taskLinkState, type TaskFrom } from './routes';

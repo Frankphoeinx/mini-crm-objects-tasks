@@ -13,7 +13,7 @@ import {
   type Profile,
 } from '@/shared/api';
 import { isReturned, paths, readTaskFrom } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueryState, ReturnedChip } from '@/shared/ui';
+import { DeleteDialog, Icon, NotFoundState, QueryState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
 import { EditLine } from './EditLine';
 import { StatusRoute } from './StatusRoute';
 import { TaskActions } from './TaskActions';
@@ -113,11 +113,10 @@ function TaskCard({ task, profiles, objects }: TaskCardProps) {
                 value={task.title}
                 onSave={(title) => save({ title })}
               />
-              <EditLine
-                className="edit-line tk-desc"
-                aria-label="Описание задачи"
+              <RichTextEditor
+                key={task.id}
+                ariaLabel="Описание задачи"
                 placeholder="Добавьте описание"
-                maxLength={5000}
                 value={task.description}
                 onSave={(description) => save({ description })}
               />
@@ -127,9 +126,7 @@ function TaskCard({ task, profiles, objects }: TaskCardProps) {
               <h1 className="h1 is-task vt" style={titleTransition}>
                 {task.title}
               </h1>
-              <p className="tk-desc" style={{ whiteSpace: 'pre-wrap' }}>
-                {task.description}
-              </p>
+              <RichTextView value={task.description} />
             </>
           )}
         </div>

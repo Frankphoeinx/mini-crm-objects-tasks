@@ -11,7 +11,7 @@ type Session = {
   last: TaskStatus | null;
 };
 
-/** Перетаскивание карточек между колонками как в crm-core.js. Касанием не работает: на телефоне кнопки. */
+/** Перетаскивание карточек между колонками. Касанием не работает: на телефоне кнопки. */
 export function useCardDrag(tasks: BoardTask[], role: Role, onDrop: (task: BoardTask, move: Move) => void) {
   const { showToast } = useToast();
   // Обработчики читают ref: состояние появляется только со следующего тика.

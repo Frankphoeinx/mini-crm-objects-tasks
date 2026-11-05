@@ -1,4 +1,4 @@
-// Типы по contract.md. Клиент не может передать status, author_id, created_by, deleted_at: их нет в Insert и Update.
+// Типы таблиц. Клиент не может передать status, author_id, created_by, deleted_at: их нет в Insert и Update.
 
 export type Role = 'manager' | 'worker';
 export type TaskStatus = 'new' | 'work' | 'review' | 'rework' | 'accepted';

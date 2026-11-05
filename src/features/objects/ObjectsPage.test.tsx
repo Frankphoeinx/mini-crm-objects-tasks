@@ -153,7 +153,7 @@ describe('состояния', () => {
   });
 });
 
-describe('окно нового объекта (AC-14)', () => {
+describe('окно нового объекта', () => {
   const open = () => userEvent.click(screen.getByRole('button', { name: 'Добавить объект' }));
   const save = () => userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
   const nameField = () => screen.getByLabelText('Название');
@@ -202,7 +202,7 @@ describe('окно нового объекта (AC-14)', () => {
   it.each([
     ['отказ базы', { code: '23514', message: 'Название: не больше 200 знаков.' }, 400, 'Название: не больше 200 знаков.'],
     ['нет сети', { message: 'TypeError: Failed to fetch' }, 0, 'Нет связи с сервером'],
-  ])('%s: окно открыто, ввод на месте (AC-18)', async (_case, error, status, text) => {
+  ])('%s: окно открыто, ввод на месте', async (_case, error, status, text) => {
     fake.respond('objects', { data: null, error, status });
     renderPage();
     await open();

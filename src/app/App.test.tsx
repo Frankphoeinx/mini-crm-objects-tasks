@@ -127,7 +127,7 @@ describe('куда после входа (контракт)', () => {
   });
 });
 
-describe('состояния каркаса (AC-18)', () => {
+describe('состояния каркаса', () => {
   it('ошибка загрузки профиля с повтором', async () => {
     fake.respond('profiles', { error: { message: 'TypeError: Failed to fetch' }, status: 0 });
     const user = userEvent.setup();
@@ -183,7 +183,7 @@ describe('верхняя панель', () => {
     expect(document.querySelector('.tab-n')).not.toBeInTheDocument();
   });
 
-  it('счётчик «Мои задачи»: мои задачи, которые ждут моего действия (AC-16)', async () => {
+  it('счётчик «Мои задачи»: мои задачи, которые ждут моего действия', async () => {
     fake.respond('task_board', {
       data: [
         makeTask({ id: 't1', assignee_id: worker.id, status: 'new' }),
@@ -249,7 +249,7 @@ describe('верхняя панель', () => {
   });
 });
 
-describe('окно отмены внутри сайта (AC-12)', () => {
+describe('окно отмены внутри сайта', () => {
   const advance = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));
 
   beforeEach(() => {

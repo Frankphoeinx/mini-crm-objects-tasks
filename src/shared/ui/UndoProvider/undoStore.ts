@@ -144,10 +144,11 @@ export function createUndoStore(describeError: (error: unknown) => string) {
       live.forEach((action) => action.apply());
     },
 
-    /** Уход и смена пользователя: окно закрывается, неотправленное в базу не уходит (допущение AC-12). */
+    /** Уход и смена пользователя: окно закрывается, неотправленное в базу не уходит (допущение из docs/05). */
     dispose() {
       if (current) clearTimeout(current.timer);
       current = null;
+      live.clear();
       clearTimeout(toastTimer);
       clearTimeout(flashTimer);
     },

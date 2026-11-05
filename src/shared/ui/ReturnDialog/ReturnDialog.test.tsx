@@ -106,7 +106,7 @@ describe('useRequestMove', () => {
     expect(screen.getByLabelText('Что нужно исправить')).toHaveValue('Длинный текст причины');
   });
 
-  it('потеря сети не теряет комментарий: окно открывается снова с тем же текстом (AC-18)', async () => {
+  it('потеря сети не теряет комментарий: окно открывается снова с тем же текстом', async () => {
     fake.respond('change_task_status', { error: { message: 'TypeError: Failed to fetch' }, status: 0 });
     setup();
     fireEvent.click(screen.getByRole('button', { name: 'Вернуть' }));

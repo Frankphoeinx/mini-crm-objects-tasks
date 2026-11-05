@@ -1,10 +1,11 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useCreateTask, userMessage, type ObjectRow, type Profile } from '@/shared/api';
-import { fullName } from '@/shared/lib';
-import { Avatar, Dialog, Icon, objectOptions, personOptions, Picker } from '@/shared/ui';
+import { DESCRIPTION_MAX, fullName } from '@/shared/lib';
+import { Avatar, Dialog, Icon, objectOptions, personOptions, Picker, RichTextEditor } from '@/shared/ui';
 
 const TITLE = 'Новая задача';
 const ERROR_ID = 'bs-terr';
+const DESCRIPTION_LABEL = 'Описание';
 
 type CreateTaskDialogProps = {
   /** Объект, на котором открыли окно. */
@@ -14,7 +15,7 @@ type CreateTaskDialogProps = {
   onClose: () => void;
 };
 
-/** Окно создания задачи. Статус и автора ставит база; исполнителя можно выбрать позже (AC-15). */
+/** Окно создания задачи. Статус и автора ставит база; исполнителя можно выбрать позже. */
 export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateTaskDialogProps) {
   const create = useCreateTask();
   const titleRef = useRef<HTMLInputElement>(null);
@@ -23,6 +24,7 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
   const [placeId, setPlaceId] = useState(objectId);
   const [assigneeId, setAssigneeId] = useState('');
   const [titleMissing, setTitleMissing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [picking, setPicking] = useState<{ kind: 'object' | 'person'; anchor: HTMLElement } | null>(null);
 
   function save(e: FormEvent) {
@@ -31,6 +33,11 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
     if (!name) {
       setTitleMissing(true);
       titleRef.current?.focus();
+      return;
+    }
+    // Причину уже показывает редактор, введённое остаётся.
+    if (description.length > DESCRIPTION_MAX) {
+      e.currentTarget.querySelector<HTMLElement>(`[aria-label="${DESCRIPTION_LABEL}"]`)?.focus();
       return;
     }
     create.mutate({ object_id: placeId, title: name, description: description.trim(), assignee_id: assigneeId || null }, { onSuccess: () => onClose() });
@@ -55,12 +62,15 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
               onChange={(e) => {
                 setTitle(e.target.value);
                 setTitleMissing(false);
+                // Только прошлый отказ: идущий запрос сбрасывать нельзя, иначе окно можно отправить второй раз.
+                if (create.isError) create.reset();
               }}
             />
           </div>
           <div className="field">
-            <label htmlFor="bs-tdesc">Описание</label>
-            <textarea id="bs-tdesc" className="input" value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+            {/* Поле с разметкой не связать с label: название ему задаёт ariaLabel. */}
+            <span className="rt-label">{DESCRIPTION_LABEL}</span>
+            <RichTextEditor ariaLabel={DESCRIPTION_LABEL} placeholder="Добавьте описание" value={description} onChange={setDescription} onUploadingChange={setUploading} />
           </div>
           <div className="field">
             <label htmlFor="bs-tobj">Объект</label>
@@ -87,7 +97,7 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
             <button className="btn is-soft" type="button" onClick={requestClose}>
               Отмена
             </button>
-            <button className="btn is-primary" type="submit" disabled={create.isPending}>
+            <button className="btn is-primary" type="submit" disabled={create.isPending || uploading}>
               Сохранить
             </button>
           </div>
