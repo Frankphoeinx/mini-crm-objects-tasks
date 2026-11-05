@@ -49,13 +49,14 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   return (
     <UndoContext value={store}>
       {children}
-      {createPortal(
+      {/* Область живёт постоянно и вне портала: иначе диктор может пропустить текст, появившийся вместе с ней. */}
+      <div className="sr" aria-live="polite" aria-atomic="true" role={announcement ? 'status' : undefined}>
+        {announcement}
+      </div>
+      {(undo || toast) &&
+        createPortal(
           <>
-            {/* Область живёт постоянно: иначе диктор может пропустить текст, появившийся вместе с ней. */}
-            <div className="sr" aria-live="polite" aria-atomic="true" role={announcement ? 'status' : undefined}>
-              {announcement}
-            </div>
-            {undo && (
+                        {undo && (
               <div className="toast undo">
                 <span aria-hidden="true">{undo.text}</span>
                 <button className="undo-btn" type="button" onClick={store.undo}>
