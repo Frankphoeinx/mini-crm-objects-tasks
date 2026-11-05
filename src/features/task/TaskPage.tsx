@@ -1,0 +1,161 @@
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import {
+  ApiError,
+  useDeleteTask,
+  useMe,
+  useObjects,
+  useProfiles,
+  userMessage,
+  useTask,
+  type BoardTask,
+  type ObjectRow,
+  type Profile,
+} from '@/shared/api';
+import { isReturned, paths, readTaskFrom } from '@/shared/lib';
+import { DeleteDialog, Icon, NotFoundState, QueryState, ReturnedChip } from '@/shared/ui';
+import { EditLine } from './EditLine';
+import { StatusRoute } from './StatusRoute';
+import { TaskActions } from './TaskActions';
+import { TaskHistory } from './TaskHistory';
+import { TaskPeople } from './TaskPeople';
+import { useSaveTask } from './useSaveTask';
+
+/** Карточка задачи (/tasks/:id). Показывает только доступное, права держит база. */
+export function TaskPage({ taskId }: { taskId: string }) {
+  const task = useTask(taskId);
+  const profiles = useProfiles();
+  const objects = useObjects();
+  const navigate = useNavigate();
+
+  const notFound = (
+    <NotFoundState
+      action={
+        <button className="btn is-primary" type="button" onClick={() => navigate(paths.objects)}>
+          К объектам
+        </button>
+      }
+    />
+  );
+  // Адрес с id не того вида база отвергает ошибкой, но для человека задачи просто нет.
+  if (task.error instanceof ApiError && task.error.kind === 'not-found') return notFound;
+
+  return (
+    <QueryState query={task} notFound={notFound}>
+      {(row) => (
+        <QueryState query={profiles}>
+          {(people) => (
+            <QueryState query={objects}>{(places) => <TaskCard task={row} profiles={people} objects={places} />}</QueryState>
+          )}
+        </QueryState>
+      )}
+    </QueryState>
+  );
+}
+
+type TaskCardProps = { task: BoardTask; profiles: Profile[]; objects: ObjectRow[] };
+
+function TaskCard({ task, profiles, objects }: TaskCardProps) {
+  const me = useMe();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { save } = useSaveTask(task.id);
+  const remove = useDeleteTask();
+  const [deleting, setDeleting] = useState(false);
+
+  // Объект берём из задачи, а не с момента открытия: после смены объекта назад ведёт уже на новый.
+  const from = readTaskFrom(location.state);
+  const back =
+    from === 'my'
+      ? { path: paths.my, label: 'Мои задачи' }
+      : from === 'review'
+        ? { path: paths.review, label: 'Ждут проверки' }
+        : { path: paths.object(task.object_id), label: objects.find((o) => o.id === task.object_id)?.name ?? 'Объект' };
+
+  const titleTransition = { viewTransitionName: `floor-${task.id}` };
+
+  return (
+    <section className="tk">
+      <div className="tk-main">
+        <div className="tile tk-title w">
+          <span className="fx" aria-hidden="true"></span>
+          <div className="tk-bar">
+            <button className="back" type="button" onClick={() => navigate(back.path)}>
+              <Icon name="back" />
+              {back.label}
+            </button>
+            {isReturned(task) && <ReturnedChip />}
+            {me.isManager && (
+              <div className="tk-manage">
+                <button
+                  className="ibtn is-danger"
+                  type="button"
+                  aria-label="Удалить задачу"
+                  title="Удалить задачу"
+                  onClick={() => setDeleting(true)}
+                >
+                  <Icon name="trash" />
+                </button>
+              </div>
+            )}
+          </div>
+          {me.isManager ? (
+            <>
+              <h1 className="sr">{task.title}</h1>
+              {/* maxLength: те же пределы, что в базе, чтобы длинный текст не пропал после отказа. */}
+              <EditLine
+                className="edit-line h1 is-task"
+                aria-label="Название задачи"
+                style={titleTransition}
+                maxLength={200}
+                required
+                oneLine
+                value={task.title}
+                onSave={(title) => save({ title })}
+              />
+              <EditLine
+                className="edit-line tk-desc"
+                aria-label="Описание задачи"
+                placeholder="Добавьте описание"
+                maxLength={5000}
+                value={task.description}
+                onSave={(description) => save({ description })}
+              />
+            </>
+          ) : (
+            <>
+              <h1 className="h1 is-task vt" style={titleTransition}>
+                {task.title}
+              </h1>
+              <p className="tk-desc" style={{ whiteSpace: 'pre-wrap' }}>
+                {task.description}
+              </p>
+            </>
+          )}
+        </div>
+
+        <TaskHistory taskId={task.id} profiles={profiles} />
+        <StatusRoute taskId={task.id} status={task.status} />
+      </div>
+
+      <div className="tk-side">
+        <TaskActions task={task} profiles={profiles} />
+        <TaskPeople task={task} profiles={profiles} objects={objects} />
+      </div>
+
+      {deleting && (
+        <DeleteDialog
+          title={`Удалить задачу «${task.title}»?`}
+          text="Задача исчезнет у постановщиков и исполнителя. История останется в базе."
+          busy={remove.isPending}
+          error={remove.error ? userMessage(remove.error) : undefined}
+          onConfirm={() => remove.mutate(task.id, { onSuccess: () => void navigate(back.path, { replace: true }) })}
+          onClose={() => {
+            setDeleting(false);
+            remove.reset();
+          }}
+        />
+      )}
+    </section>
+  );
+}

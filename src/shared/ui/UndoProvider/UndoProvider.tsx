@@ -1,0 +1,76 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { createContext, use, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { userMessage } from '../../api/errors';
+import { portalRoot } from '../portal';
+import { Toast } from '../Toast';
+import { createUndoStore, type MoveFlash, type UndoStore } from './undoStore';
+
+const UndoContext = createContext<UndoStore | null>(null);
+
+function useStore() {
+  const store = use(UndoContext);
+  if (!store) throw new Error('Нужен UndoProvider выше по дереву');
+  return store;
+}
+
+/**
+ * Очередь отмены (AC-12) и хост подсказок. Одно окно на сайт: новое действие сначала отправляет предыдущее.
+ * Смена пользователя пересоздаёт провайдер по key: неотправленное не уйдёт в базу от чужого имени.
+ */
+export function UndoProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
+  const [store] = useState(() => createUndoStore(userMessage));
+  const { undo, toast } = useSyncExternalStore(store.subscribe, store.getSnapshot);
+
+  useEffect(() => store.dispose, [store]);
+
+  // Возврат на вкладку и чужие правки перезагружают данные: действие в окне отмены не должно пропасть с экрана.
+  useEffect(
+    () =>
+      queryClient.getQueryCache().subscribe((event) => {
+        if (event.type === 'updated' && event.action.type === 'success' && !event.action.manual) store.reapply();
+      }),
+    [queryClient, store],
+  );
+
+  return (
+    <UndoContext value={store}>
+      {children}
+      {(undo || toast) &&
+        createPortal(
+          <>
+            {undo && (
+              <div className="toast undo" role="status">
+                <span>{undo.text}</span>
+                <button className="undo-btn" type="button" onClick={store.undo}>
+                  Отменить
+                </button>
+                <span className={`undo-bar ${undo.seq % 2 ? 'is-odd' : 'is-even'}`} aria-hidden="true"></span>
+              </div>
+            )}
+            {toast && <Toast text={toast} />}
+          </>,
+          portalRoot(),
+        )}
+    </UndoContext>
+  );
+}
+
+/** run(action): показать действие и открыть окно отмены. discard(key): снять действия удалённой записи. */
+export function useUndo() {
+  const { run, discard } = useStore();
+  return { run, discard };
+}
+
+/** showToast(text, ms?): подсказка внизу экрана. */
+export function useToast() {
+  const { showToast } = useStore();
+  return { showToast };
+}
+
+/** Какая смена статуса только что случилась: для анимации карточки. */
+export function useMoveFlash(): MoveFlash {
+  const store = useStore();
+  return useSyncExternalStore(store.subscribe, () => store.getSnapshot().flash);
+}
