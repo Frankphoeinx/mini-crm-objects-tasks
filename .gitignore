@@ -1,0 +1,11 @@
+.vercel
+node_modules
+dist
+coverage
+*.local
+.DS_Store
+
+# Переменные окружения: в репозитории только пример без значений.
+.env
+.env.*
+!.env.example

@@ -1,0 +1,75 @@
+-- Общая подготовка тестов: люди, объекты, задачи и вход под ролью. Подключается через \ir внутри транзакции теста.
+
+set local client_min_messages = warning;
+
+-- Имя превращается в постоянный uuid: в тексте теста видно, кто и над чем действует.
+create function pg_temp.id(p_name text) returns uuid
+language sql immutable as $$ select md5(p_name)::uuid $$;
+
+create function pg_temp.login(p_name text, p_extra jsonb default '{}') returns void
+language sql as $$
+  select
+    set_config('role', 'authenticated', true),
+    set_config('request.jwt.claims', (jsonb_build_object('sub', pg_temp.id(p_name), 'role', 'authenticated') || p_extra)::text, true)
+$$;
+
+create function pg_temp.login_anon() returns void
+language sql as $$
+  select set_config('role', 'anon', true), set_config('request.jwt.claims', '{"role": "anon"}', true)
+$$;
+
+create function pg_temp.login_service() returns void
+language sql as $$
+  select set_config('role', 'service_role', true), set_config('request.jwt.claims', '{"role": "service_role"}', true)
+$$;
+
+-- Назад к владельцу таблиц: RLS и права колонок на него не действуют, поэтому проверяем данные отсюда.
+create function pg_temp.logout() returns void
+language sql as $$
+  select set_config('role', 'none', true), set_config('request.jwt.claims', '', true)
+$$;
+
+-- Сколько строк задела команда: под RLS чужое даёт 0 строк без ошибки.
+create function pg_temp.affected(p_sql text) returns integer
+language plpgsql as $$
+declare
+  v_rows integer;
+begin
+  execute p_sql;
+  get diagnostics v_rows = row_count;
+  return v_rows;
+end
+$$;
+
+-- Триггеры поставили бы текущего автора и статус, а фикстуре нужны готовые строки.
+set local session_replication_role = replica;
+
+-- ghost вошёл, но профиля у него нет.
+insert into auth.users (id, email)
+select pg_temp.id(n), n || '@test.local'
+from unnest(array['boss', 'boss2', 'w1', 'w2', 'ghost']) as n;
+
+insert into public.profiles (id, full_name, role) values
+  (pg_temp.id('boss'), 'Босс Первый', 'manager'),
+  (pg_temp.id('boss2'), 'Босс Второй', 'manager'),
+  (pg_temp.id('w1'), 'Рабочий Первый', 'worker'),
+  (pg_temp.id('w2'), 'Рабочий Второй', 'worker');
+
+insert into public.objects (id, name, address, created_by) values
+  (pg_temp.id('obj-a'), 'Объект А', 'Адрес А', pg_temp.id('boss')),
+  (pg_temp.id('obj-b'), 'Объект Б', 'Адрес Б', pg_temp.id('boss')),
+  (pg_temp.id('obj-c'), 'Объект В', 'Адрес В', pg_temp.id('boss'));
+
+-- У w1 задача только на А, у w2 только на Б. На В задачи постановщиков: своя и без исполнителя.
+insert into public.tasks (id, object_id, title, assignee_id, status, author_id) values
+  (pg_temp.id('task-a'), pg_temp.id('obj-a'), 'Задача А', pg_temp.id('w1'), 'work', pg_temp.id('boss')),
+  (pg_temp.id('task-b'), pg_temp.id('obj-b'), 'Задача Б', pg_temp.id('w2'), 'work', pg_temp.id('boss')),
+  (pg_temp.id('task-self'), pg_temp.id('obj-c'), 'Своя задача', pg_temp.id('boss'), 'new', pg_temp.id('boss')),
+  (pg_temp.id('task-free'), pg_temp.id('obj-c'), 'Без исполнителя', null, 'new', pg_temp.id('boss'));
+
+insert into public.task_events (task_id, kind, actor_id, to_status)
+select id, 'created', author_id, 'new'
+from public.tasks
+where id in (pg_temp.id('task-a'), pg_temp.id('task-b'), pg_temp.id('task-self'), pg_temp.id('task-free'));
+
+set local session_replication_role = origin;
