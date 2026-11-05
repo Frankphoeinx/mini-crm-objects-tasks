@@ -35,7 +35,7 @@ const REFUSED_FALLBACK: Record<string, string> = {
   '23514': 'Данные не прошли проверку. Проверьте, что заполнено, и попробуйте снова.',
 };
 // PGRST116: запрос .single() не нашёл строку. 22P02: в адресе не uuid, такой записи не может быть.
-const NOT_FOUND_CODES = new Set(['P0002', 'PGRST116', '22P02']);
+const NOT_FOUND_CODES = new Set(['PT404', 'PGRST116', '22P02']);
 
 const isHumanText = (text: string) => /[а-яё]/i.test(text);
 

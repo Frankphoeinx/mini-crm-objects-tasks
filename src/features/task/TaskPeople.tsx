@@ -1,6 +1,6 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useMe, type BoardTask, type ObjectRow, type Profile } from '@/shared/api';
-import { canClearAssignee, formatDateTime, fullName } from '@/shared/lib';
+import { canClearAssignee, delay, formatDateTime, fullName } from '@/shared/lib';
 import { Avatar, Icon, objectOptions, personOptions, Picker, type IconName, type PickerOption } from '@/shared/ui';
 import { useSaveTask } from './useSaveTask';
 
@@ -69,7 +69,7 @@ export function TaskPeople({ task, profiles, objects }: TaskPeopleProps) {
   const place = objects.find((o) => o.id === shown.object_id)?.name ?? '';
 
   return (
-    <section className="tile tk-people w" style={{ '--d': '75ms' } as CSSProperties}>
+    <section className="tile tk-people w" style={delay('75ms')}>
       <h2 className="tile-h">Люди и даты</h2>
       <dl className="people">
         <Row icon="work" label="Исполнитель" pick={me.isManager}>

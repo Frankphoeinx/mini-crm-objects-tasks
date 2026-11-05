@@ -1,1 +1,1 @@
-export { EmptyState, ErrorState, LoadingState, NotFoundState, QueryState } from './States';
+export { EmptyState, ErrorState, LoadingState, NotFoundState, QueriesState, QueryState } from './States';

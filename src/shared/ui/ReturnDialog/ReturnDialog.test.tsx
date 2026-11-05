@@ -25,7 +25,7 @@ describe('ReturnDialog', () => {
     expect(screen.getByLabelText('Что нужно исправить')).toHaveFocus();
   });
 
-  it.each(['   ', '\n\t'])('пробелы не считаются комментарием: %j', (text) => {
+  it.each(['   ', '\n\t', '\u200b', '.', '—'])('пробелы и знаки не считаются комментарием: %j', (text) => {
     const onConfirm = vi.fn();
     render(<ReturnDialog taskTitle="Ворота" onConfirm={onConfirm} onClose={() => {}} />);
     fireEvent.change(screen.getByLabelText('Что нужно исправить'), { target: { value: text } });

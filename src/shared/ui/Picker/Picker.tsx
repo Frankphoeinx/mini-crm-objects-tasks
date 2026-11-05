@@ -65,11 +65,17 @@ export function Picker({ anchor, options, value, onPick, onClose }: PickerProps)
 
   // Вести список за кнопкой незачем: прокрутка или смена размера просто закрывают его.
   const closeQuietly = useEffectEvent(() => onClose());
+  // Прокручивается только то, что двигает кнопку: свой список и соседнее поле с длинным текстом её не двигают.
+  const onScroll = useEffectEvent((e: Event) => {
+    if (e.target instanceof Node && !e.target.contains(anchor)) return;
+    closeQuietly();
+  });
+  // Выбранный пункт исчез вместе со списком: без этого Esc и Tab в окне перестали бы работать.
+  const backToAnchor = useEffectEvent(() => {
+    if (anchor.isConnected && document.activeElement === document.body) anchor.focus({ preventScroll: true });
+  });
+  useEffect(() => backToAnchor, []);
   useEffect(() => {
-    const onScroll = (e: Event) => {
-      if (e.target instanceof Node && listRef.current?.contains(e.target)) return;
-      closeQuietly();
-    };
     window.addEventListener('scroll', onScroll, { capture: true });
     window.addEventListener('resize', closeQuietly);
     return () => {

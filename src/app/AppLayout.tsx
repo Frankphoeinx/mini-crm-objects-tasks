@@ -1,4 +1,4 @@
-import { useState, ViewTransition } from 'react';
+import { useEffect, useRef, useState, ViewTransition } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { signOut, useMe, useMyTurnCount } from '@/shared/api';
 import { paths } from '@/shared/lib';
@@ -10,6 +10,12 @@ export function AppLayout() {
   const turn = useMyTurnCount();
   const location = useLocation();
   const navigate = useNavigate();
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Кнопка, по которой ушли со страницы (удаление, смена экрана), исчезла: клавиатура продолжает с начала нового экрана, а не с начала сайта.
+  useEffect(() => {
+    if (document.activeElement === document.body) mainRef.current?.focus({ preventScroll: true });
+  }, [location.pathname]);
   const { showToast } = useToast();
   const [leaving, setLeaving] = useState(false);
   const tab = activeTab(location.pathname, location.state);
@@ -70,7 +76,7 @@ export function AppLayout() {
         </div>
       </header>
       <ViewTransition default="bs-page">
-        <main className="page-main">
+        <main className="page-main" ref={mainRef} tabIndex={-1}>
           <Outlet />
         </main>
       </ViewTransition>

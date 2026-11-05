@@ -1,8 +1,7 @@
-import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import { useMe, useObjects, useProfiles, useReviewTasks, type BoardTask, type ObjectRow, type Profile } from '@/shared/api';
-import { isReturned, movesFor, paths, shortName, taskLinkState, waveDelay } from '@/shared/lib';
-import { Icon, MoveButtons, QueryState, ReturnedChip, useRequestMove } from '@/shared/ui';
+import { delay, isReturned, movesFor, paths, shortName, taskLinkState, waveDelay } from '@/shared/lib';
+import { Icon, MoveButtons, QueriesState, ReturnedChip, useRequestMove } from '@/shared/ui';
 
 function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects: ObjectRow[]; profiles: Profile[] }) {
   const me = useMe();
@@ -12,7 +11,7 @@ function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects:
   return (
     <>
       {tasks.length === 0 && (
-        <div className="tile empty w" style={{ '--d': '25ms' } as CSSProperties}>
+        <div className="tile empty w" style={delay('25ms')}>
           <Icon name="review" className="ic-xl" />
           <h2 className="tile-h">Сейчас ничего не ждёт проверки</h2>
           <p>Когда исполнитель сдаст работу, задача появится здесь.</p>
@@ -23,7 +22,7 @@ function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects:
           const returned = isReturned(task);
           const moves = movesFor(task, me);
           return (
-            <article key={task.id} className={returned ? 'kcard w is-returned' : 'kcard w'} data-card={task.id} style={{ '--d': waveDelay(i) } as CSSProperties}>
+            <article key={task.id} className={returned ? 'kcard w is-returned' : 'kcard w'} data-card={task.id} style={delay(waveDelay(i))}>
               <span className="kfx" aria-hidden="true"></span>
               <button className="kopen" type="button" onClick={() => navigate(paths.task(task.id), { state: taskLinkState('review') })}>
                 <span className="vt" style={{ display: 'block', viewTransitionName: `floor-${task.id}` }}>
@@ -64,17 +63,7 @@ export function ReviewPage() {
         </button>
         <h1 className="h1">Ждут проверки</h1>
       </div>
-      <QueryState query={tasks}>
-        {(taskRows) => (
-          <QueryState query={objects}>
-            {(objectRows) => (
-              <QueryState query={profiles}>
-                {(people) => <ReviewList tasks={taskRows} objects={objectRows} profiles={people} />}
-              </QueryState>
-            )}
-          </QueryState>
-        )}
-      </QueryState>
+      <QueriesState queries={[tasks, objects, profiles]}>{(taskRows, objectRows, people) => <ReviewList tasks={taskRows} objects={objectRows} profiles={people} />}</QueriesState>
     </section>
   );
 }

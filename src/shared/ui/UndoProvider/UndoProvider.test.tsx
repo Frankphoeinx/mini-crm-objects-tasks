@@ -272,6 +272,18 @@ describe('UndoProvider', () => {
     expect(screen.getByRole('button', { name: 'Отменить' })).toBeTruthy();
   });
 
+  it('кнопка ушла вместе с карточкой: фокус на названии карточки, а не в начале страницы', async () => {
+    setup();
+    const card = document.createElement('article');
+    card.dataset.card = 't1';
+    card.innerHTML = '<button class="kopen">Задача</button>';
+    document.body.append(card);
+    act(() => run(makeAction({ flash: { to: 'work', taskId: 't1' } })));
+    await advance(100);
+    expect(document.activeElement).toBe(card.querySelector('.kopen'));
+    card.remove();
+  });
+
   it('фоновая загрузка возвращает неподтверждённое действие поверх новых данных', async () => {
     const { queryClient } = setup();
     const action = makeAction();

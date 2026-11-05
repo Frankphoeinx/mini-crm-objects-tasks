@@ -1,6 +1,5 @@
-import type { CSSProperties } from 'react';
 import { useTaskEvents, type Profile, type TaskEvent, type TaskStatus } from '@/shared/api';
-import { formatDateTime, fullName, plainText, STATUS_LABEL, waveDelay } from '@/shared/lib';
+import { delay, formatDateTime, fullName, plainText, STATUS_LABEL, waveDelay } from '@/shared/lib';
 import { ErrorState, LoadingState, useMoveFlash } from '@/shared/ui';
 
 const statusText = (status: TaskStatus | null) => (status ? STATUS_LABEL[status] : '');
@@ -54,7 +53,7 @@ export function TaskHistory({ taskId, profiles }: { taskId: string; profiles: Pr
 
   const lastAt = events.data.length - 1;
   return (
-    <section className="tile tk-hist w" style={{ '--d': '100ms' } as CSSProperties}>
+    <section className="tile tk-hist w" style={delay('100ms')}>
       <h2 className="tile-h">История</h2>
       <ol className="tl">
         {events.data.map((event, i) => {
@@ -64,7 +63,7 @@ export function TaskHistory({ taskId, profiles }: { taskId: string; profiles: Pr
               // История только дополняется. По номеру в списке: временная строка получит id из базы, но не появится заново.
               key={i}
               className={`ev w${event.kind === 'edit' ? ' is-edit' : ''}${isNew ? ' is-new' : ''}`}
-              style={{ '--d': isNew ? '0ms' : waveDelay(i) } as CSSProperties}
+              style={delay(isNew ? '0ms' : waveDelay(i))}
             >
               <span className="ev-dot" aria-hidden="true"></span>
               <b>{eventText(event)}</b>

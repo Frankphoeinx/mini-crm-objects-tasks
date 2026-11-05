@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useBoardTasks, useMe, useMyTurnCount, useObjects, type BoardTask, type ObjectRow } from '@/shared/api';
 import { delay, paths, percent, plural, ratio, waveDelay } from '@/shared/lib';
-import { Building, Icon, QueryState, ReviewTile, Roll, Tape } from '@/shared/ui';
+import { Building, Icon, QueriesState, ReviewTile, Roll, Tape } from '@/shared/ui';
 import { ObjectDialog } from './ObjectDialog';
 import { objectStats, ReadyTile } from './SummaryTiles';
 
@@ -112,9 +112,7 @@ export function ObjectsPage() {
   return (
     <section className="objs">
       <h1 className="page-h w">Объекты</h1>
-      <QueryState query={objects}>
-        {(objectRows) => <QueryState query={tasks}>{(taskRows) => <ObjectsContent objects={objectRows} tasks={taskRows} />}</QueryState>}
-      </QueryState>
+      <QueriesState queries={[objects, tasks]}>{(objectRows, taskRows) => <ObjectsContent objects={objectRows} tasks={taskRows} />}</QueriesState>
     </section>
   );
 }

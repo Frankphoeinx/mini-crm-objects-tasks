@@ -11,7 +11,8 @@
     "build": "vite build",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "gen:types": "supabase gen types typescript --local --schema public > src/shared/api/database.generated.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0",

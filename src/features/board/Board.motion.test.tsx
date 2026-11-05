@@ -151,6 +151,17 @@ describe('Перетаскивание', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
+  it('провели над запретной колонкой и отпустили мимо доски: подсказки нет', async () => {
+    show([makeTask({ status: 'work' })]);
+    await startDrag();
+    fireEvent.dragOver(col('accepted'), dt());
+    document.elementFromPoint = () => document.body;
+    const end = createEvent.dragEnd(card(), dt('none'));
+    Object.defineProperty(end, 'clientX', { value: 5 });
+    fireEvent(card(), end);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
   it('ни над одной колонкой не был: подсказки нет', async () => {
     show([makeTask({ status: 'work' })]);
     await startDrag();

@@ -13,7 +13,7 @@ import {
   type Profile,
 } from '@/shared/api';
 import { isReturned, paths, readTaskFrom } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueryState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
+import { DeleteDialog, Icon, NotFoundState, QueriesState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
 import { EditLine } from './EditLine';
 import { StatusRoute } from './StatusRoute';
 import { TaskActions } from './TaskActions';
@@ -41,15 +41,9 @@ export function TaskPage({ taskId }: { taskId: string }) {
   if (task.error instanceof ApiError && task.error.kind === 'not-found') return notFound;
 
   return (
-    <QueryState query={task} notFound={notFound}>
-      {(row) => (
-        <QueryState query={profiles}>
-          {(people) => (
-            <QueryState query={objects}>{(places) => <TaskCard task={row} profiles={people} objects={places} />}</QueryState>
-          )}
-        </QueryState>
-      )}
-    </QueryState>
+    <QueriesState queries={[task, profiles, objects]} notFound={notFound}>
+      {(row, people, places) => <TaskCard task={row} profiles={people} objects={places} />}
+    </QueriesState>
   );
 }
 

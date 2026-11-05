@@ -1,8 +1,8 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useMe, userMessage, useUpdateTask, type BoardTask, type Profile, type TaskStatus } from '@/shared/api';
-import { buildBoard, canAssign, canClearAssignee, movesFor, paths, taskLinkState, type Move, type TaskFrom } from '@/shared/lib';
-import { ERROR_TOAST_MS, Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
+import { buildBoard, canAssign, canClearAssignee, delay, movesFor, paths, taskLinkState, type Move, type TaskFrom } from '@/shared/lib';
+import { ERROR_TOAST_MS, FOCUS_DELAY_MS, focusTask, Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
 import { BoardCard, cx, type CardMeta } from './BoardCard';
 import { useCardDrag } from './useCardDrag';
 import { useCardFlip } from './useCardFlip';
@@ -67,7 +67,7 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
   }
 
   return (
-    <div className="tile board-tile w" style={{ '--d': '50ms' } as CSSProperties}>
+    <div className="tile board-tile w" style={delay('50ms')}>
       <div className="board-box">
         <section className="board" aria-label="Доска задач" ref={boardRef}>
           {columns.map((col, ci) => {
@@ -133,7 +133,16 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
           value=""
           options={personOptions(people, canClearAssignee(assigning.task.status))}
           onPick={(id) => {
-            if (id) assign.mutate({ id: assigning.task.id, patch: { assignee_id: id } }, { onError: (error) => showToast(userMessage(error), ERROR_TOAST_MS) });
+            if (!id) return;
+            const taskId = assigning.task.id;
+            assign.mutate(
+              { id: taskId, patch: { assignee_id: id } },
+              {
+                onError: (error) => showToast(userMessage(error), ERROR_TOAST_MS),
+                // Кнопка «Назначить» исчезает после ответа базы.
+                onSettled: () => void setTimeout(() => focusTask(taskId), FOCUS_DELAY_MS),
+              },
+            );
           }}
           onClose={() => setAssigning(null)}
         />

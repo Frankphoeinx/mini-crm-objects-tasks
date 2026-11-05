@@ -20,6 +20,8 @@
   .tab, .user .btn, .back, .undo-btn { min-height: 44px; }
 }
 
+.bs .page-main:focus-visible { outline: none; }
+
 /* Редактор описания: поле как .input, панель без рамок, шрифт поля не меньше 16 px, чтобы телефон не увеличивал страницу. */
 .rt-label { font-size: 14px; font-weight: 500; }
 .rt, .rt-view { width: 100%; min-width: 0; }
@@ -28,6 +30,7 @@
 .rt:has(.rt-field:focus-visible) { outline: 3px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 2px #FFFFFF; }
 .bs .rt-field:focus-visible { outline: none; box-shadow: none; }
 .rt-bar { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px; }
+.rt-bar-wait { height: 48px; }
 .rt-bar .ibtn { flex: 0 1 40px; min-width: 40px; width: auto; height: 40px; background: none; }
 .rt-bar .ibtn[aria-pressed="true"] { background: var(--ink); color: #FFFFFF; }
 @media (hover: hover) {
@@ -53,4 +56,5 @@
 @media (max-width: 640px) {
   .rt-bar .ibtn { flex-basis: 44px; height: 44px; }
   .rt-field { min-height: 72px; }
+  .rt-bar-wait { height: 52px; }
 }

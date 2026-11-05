@@ -259,6 +259,14 @@ describe('ObjectBoard: «Назначить»', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
+  it('после назначения кнопка исчезает, фокус переходит на название карточки', async () => {
+    show([makeTask({ assignee_id: null })]);
+    await userEvent.click(assignButton() as HTMLElement);
+    fake.respond('task_board', { data: [makeTask({ assignee_id: worker.id })] });
+    await userEvent.click(screen.getByRole('option', { name: /Пётр Иванов/ }));
+    await waitFor(() => expect(within(card('t1')).getByRole('button', { name: 'Залить фундамент' })).toHaveFocus());
+  });
+
   it('«Не назначен» у задачи без исполнителя ничего не отправляет', async () => {
     show([makeTask({ assignee_id: null })]);
     await userEvent.click(assignButton() as HTMLElement);

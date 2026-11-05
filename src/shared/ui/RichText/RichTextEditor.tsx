@@ -26,6 +26,7 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
   const [extensions] = useState(() => richTextExtensions(placeholder));
   const [uploadError, setUploadError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [length, setLength] = useState(0);
   const pendingUploads = useRef(0);
 
   // Сравниваем текст редактора с ним самим при открытии: разбор Markdown может отличаться от исходной строки.
@@ -58,16 +59,15 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
     },
     onUpdate: ({ editor: changed }) => {
       setUploadError('');
-      onChange?.(read(changed));
+      const markdown = read(changed);
+      setLength(markdown.length);
+      onChange?.(markdown);
     },
   });
 
-  const state = useEditorState({
+  const active = useEditorState({
     editor,
-    selector: ({ editor: current }) => ({
-      active: FORMATS.filter((format) => current.isActive(format.name)).map((format) => format.name),
-      length: read(current).length,
-    }),
+    selector: ({ editor: current }) => FORMATS.filter((format) => current.isActive(format.name)).map((format) => format.name),
   });
 
   useEffect(() => {
@@ -116,8 +116,8 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
         const src = await uploadTaskImage(file, me.id);
         if (editor.isDestroyed) return;
         editor.commands.insertContent({ type: 'image', attrs: { src } });
-        // Пока файл грузился, из редактора могли уйти: события ухода больше не будет.
-        if (!rootRef.current?.contains(document.activeElement)) save();
+        // Картинка не ждёт ухода из поля: закрытая вкладка не должна оставить файл без описания.
+        save();
       } catch (error) {
         setUploadError(userMessage(error));
       } finally {
@@ -126,7 +126,7 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
     }
   }
 
-  const tooLong = state.length > DESCRIPTION_MAX;
+  const tooLong = length > DESCRIPTION_MAX;
 
   return (
     <div
@@ -145,7 +145,7 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
             type="button"
             aria-label={format.label}
             title={format.label}
-            aria-pressed={state.active.includes(format.name)}
+            aria-pressed={active.includes(format.name)}
             onClick={() => format.toggle(editor.chain().focus()).run()}
           >
             <Icon name={format.icon} />
@@ -180,7 +180,7 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
       )}
       {tooLong && (
         <p className="err rt-note" role="alert">
-          Описание длиннее {DESCRIPTION_MAX} знаков (сейчас {state.length}) и не сохранится. Сократите его.
+          Описание длиннее {DESCRIPTION_MAX} знаков (сейчас {length}) и не сохранится. Сократите его.
         </p>
       )}
     </div>

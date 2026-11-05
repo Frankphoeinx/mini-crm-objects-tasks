@@ -451,13 +451,11 @@ describe('картинка в редакторе', () => {
     expect(onSave.mock.lastCall?.[0]).toMatch(/!\[\]\(.+\.png\)/);
   });
 
-  it('фокус остался в редакторе: сохранение ждёт ухода', async () => {
+  it('картинка сохраняется сразу: закрытая вкладка не оставит файл без описания', async () => {
     const { onSave } = openEditor();
     act(() => liveEditor().view.dom.focus());
     fireEvent.change(fileInput(), { target: { files: [pngFile()] } });
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
-    expect(onSave).not.toHaveBeenCalled();
-    leave();
     expect(onSave).toHaveBeenCalledOnce();
   });
 });

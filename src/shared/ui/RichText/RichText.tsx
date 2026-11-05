@@ -22,9 +22,19 @@ function Fallback({ value }: { value: string }) {
   return <p className="tk-desc rt-plain">{plainText(value)}</p>;
 }
 
+/** Та же рамка и панель, что у редактора: при первой загрузке раскладка не прыгает. */
+function EditorFallback({ value }: { value: string }) {
+  return (
+    <div className="rt">
+      <div className="rt-bar rt-bar-wait" aria-hidden="true"></div>
+      <p className="rt-field rt-plain">{plainText(value)}</p>
+    </div>
+  );
+}
+
 export function RichTextEditor(props: RichTextEditorProps) {
   return (
-    <Suspense fallback={<Fallback value={props.value} />}>
+    <Suspense fallback={<EditorFallback value={props.value} />}>
       <LazyEditor {...props} />
     </Suspense>
   );

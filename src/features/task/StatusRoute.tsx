@@ -1,6 +1,5 @@
-import type { CSSProperties } from 'react';
 import { useTaskEvents, type TaskEvent, type TaskStatus } from '@/shared/api';
-import { STATUS_LABEL } from '@/shared/lib';
+import { delay, STATUS_LABEL } from '@/shared/lib';
 import { Icon } from '@/shared/ui';
 
 /** Узлы и линии маршрута считаются по истории. Создание тоже приводит в «Новую». */
@@ -27,7 +26,7 @@ export function StatusRoute({ taskId, status }: { taskId: string; status: TaskSt
   return (
     <section
       className="tile tk-route w"
-      style={{ '--d': '50ms' } as CSSProperties}
+      style={delay('50ms')}
       aria-label={`Маршрут статусов задачи: сейчас ${STATUS_LABEL[status]}`}
     >
       <div className="route">
