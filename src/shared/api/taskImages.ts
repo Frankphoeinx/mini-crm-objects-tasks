@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from './client';
-import { ApiError, toApiError } from './errors';
+import { ApiError, toApiError } from '../lib/errors';
 
 const BUCKET = 'task-images';
 const MAX_BYTES = 5 * 1024 * 1024;

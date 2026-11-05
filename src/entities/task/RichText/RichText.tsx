@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { plainText } from '../../lib/description';
+import { plainText } from '@/shared/lib';
 
 // Редактор тяжёлый и нужен только на карточке и в окне создания: в основной файл сборки он не попадает.
 const LazyEditor = lazy(() => import('./RichTextEditor'));

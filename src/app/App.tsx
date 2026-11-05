@@ -2,7 +2,8 @@ import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router/dom';
 import type { DataRouter } from 'react-router';
 import { SessionProvider, useSession } from '@/shared/api';
-import { IconDefs, PORTAL_ROOT_ID, UndoProvider, useMoveFlash } from '@/shared/ui';
+import { IconDefs, PORTAL_ROOT_ID } from '@/shared/ui';
+import { UndoProvider, useMoveFlash } from '@/shared/undo';
 
 function Frame({ router }: { router: DataRouter }) {
   const { to } = useMoveFlash();

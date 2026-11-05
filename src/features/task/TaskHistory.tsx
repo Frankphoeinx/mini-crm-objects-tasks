@@ -1,6 +1,7 @@
 import { useTaskEvents, type Profile, type TaskEvent, type TaskStatus } from '@/shared/api';
 import { delay, formatDateTime, fullName, plainText, STATUS_LABEL, waveDelay } from '@/shared/lib';
-import { ErrorState, LoadingState, useMoveFlash } from '@/shared/ui';
+import { ErrorState, LoadingState } from '@/shared/ui';
+import { useMoveFlash } from '@/shared/undo';
 
 const statusText = (status: TaskStatus | null) => (status ? STATUS_LABEL[status] : '');
 

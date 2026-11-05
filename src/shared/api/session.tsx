@@ -2,8 +2,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, use, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { initialsOf, ROLE_LABEL } from '../lib/people';
 import { supabase } from './client';
-import { authErrorMessage, unwrap } from './errors';
-import type { Profile } from './types';
+import { authErrorMessage, unwrap } from '../lib/errors';
+import type { Profile } from '../lib/types';
 
 type SessionState = {
   status: 'loading' | 'guest' | 'ready';

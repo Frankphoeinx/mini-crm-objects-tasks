@@ -9,7 +9,7 @@ import type { FakeSupabase } from '@/shared/test/fakeSupabase';
 import { ObjectBoard } from './ObjectBoard';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
-vi.mock('@/shared/ui/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
+vi.mock('@/entities/task/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
 const fake = supabase as unknown as FakeSupabase;
 
 const objects = [makeObject(), makeObject({ id: 'o2', name: 'Склад на Южной', address: 'ул. Южная, 3' })];

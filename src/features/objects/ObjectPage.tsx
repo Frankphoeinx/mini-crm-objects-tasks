@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ApiError, useDeleteObject, useMe, useObject, useObjectTasks, userMessage, type BoardTask, type ObjectRow } from '@/shared/api';
 import { movesFor, paths, plural, usePageTitle } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundToObjects, QueryState, ReviewTile, TurnTile, useMoveFlash } from '@/shared/ui';
+import { DeleteDialog, Icon, NotFoundToObjects, QueryState, ReviewTile, TurnTile } from '@/shared/ui';
+import { useMoveFlash } from '@/shared/undo';
 import { ObjectDialog } from './ObjectDialog';
 import { objectStats, ReadyTile } from './SummaryTiles';
 

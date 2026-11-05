@@ -1,5 +1,5 @@
 import { NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
-import { useTaskImage } from '../../api/taskImages';
+import { useTaskImage } from '@/shared/api';
 
 /** Картинка описания. Путь с чужим адресом до сети не доходит, файл читается только через хранилище. */
 export function TaskImage({ node }: ReactNodeViewProps) {

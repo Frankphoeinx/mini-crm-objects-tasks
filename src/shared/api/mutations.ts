@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { useUndo } from '../ui/UndoProvider/UndoProvider';
+import { useUndo } from '../undo/UndoProvider';
 import { supabase } from './client';
-import { unwrap } from './errors';
+import { unwrap } from '../lib/errors';
 import { keys } from './queries';
-import type { BoardTask, NewObject, NewTask, ObjectRow, TaskPatch } from './types';
+import type { BoardTask, NewObject, NewTask, ObjectRow, TaskPatch } from '../lib/types';
 
 // Мутации держат isPending, пока списки не обновятся: окно закрывается уже над свежими данными.
 

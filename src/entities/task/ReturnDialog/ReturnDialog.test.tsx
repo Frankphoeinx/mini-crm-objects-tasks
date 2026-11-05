@@ -1,10 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createTestQueryClient, makeTask, manager, providers } from '../../test';
-import type { FakeSupabase } from '../../test/fakeSupabase';
-import { supabase } from '../../api/client';
-import { movesFor } from '../../lib/status';
-import type { BoardTask } from '../../api/types';
+import { createTestQueryClient, makeTask, manager, providers } from '@/shared/test';
+import type { FakeSupabase } from '@/shared/test/fakeSupabase';
+import { supabase } from '@/shared/api/client';
+import { movesFor } from '@/shared/lib';
+import type { BoardTask } from '@/shared/api';
 import { ReturnDialog } from './ReturnDialog';
 import { useRequestMove } from './useRequestMove';
 

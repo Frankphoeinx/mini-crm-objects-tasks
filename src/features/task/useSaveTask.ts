@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { ApiError, useUpdateTask, userMessage, type BoardTask, type TaskPatch } from '@/shared/api';
-import { ERROR_TOAST_MS, useToast } from '@/shared/ui';
+import { ERROR_TOAST_MS, useToast } from '@/shared/undo';
 
 const TEXT_CONFLICT = 'Этот текст только что изменил другой постановщик. Ваш вариант остался в поле: сверьте его с новой записью в истории и сохраните ещё раз.';
 

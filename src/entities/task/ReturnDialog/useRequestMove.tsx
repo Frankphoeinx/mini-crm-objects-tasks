@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { useMoveTask } from '../../api/moves';
-import type { BoardTask } from '../../api/types';
-import type { Move } from '../../lib/status';
+import { useMoveTask } from '@/shared/api';
+import type { BoardTask } from '@/shared/api';
+import type { Move } from '@/shared/lib';
 import { ReturnDialog } from './ReturnDialog';
 
 /**

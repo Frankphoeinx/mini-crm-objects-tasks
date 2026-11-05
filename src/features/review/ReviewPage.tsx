@@ -1,7 +1,8 @@
 import { Link } from 'react-router';
 import { useMe, useObjects, useProfiles, useReviewTasks, type BoardTask, type ObjectRow, type Profile } from '@/shared/api';
 import { delay, isReturned, movesFor, paths, shortName, waveDelay, usePageTitle } from '@/shared/lib';
-import { Icon, MoveButtons, QueriesState, ReturnedChip, TaskLink, useRequestMove } from '@/shared/ui';
+import { Icon, MoveButtons, QueriesState, ReturnedChip, TaskLink } from '@/shared/ui';
+import { useRequestMove } from '@/entities/task';
 
 function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects: ObjectRow[]; profiles: Profile[] }) {
   const me = useMe();

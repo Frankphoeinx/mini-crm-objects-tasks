@@ -1,7 +1,8 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useCreateTask, userMessage, type ObjectRow, type Profile } from '@/shared/api';
 import { DESCRIPTION_MAX, fullName } from '@/shared/lib';
-import { Avatar, Dialog, Icon, objectOptions, personOptions, Picker, RichTextEditor } from '@/shared/ui';
+import { Avatar, Dialog, Icon, objectOptions, personOptions, Picker } from '@/shared/ui';
+import { RichTextEditor } from '@/entities/task';
 
 const TITLE = 'Новая задача';
 const ERROR_ID = 'bs-terr';

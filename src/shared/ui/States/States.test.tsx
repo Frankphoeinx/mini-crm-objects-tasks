@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ApiError } from '../../api/errors';
+import { ApiError } from '../../lib/errors';
 import { EmptyState, ErrorState, LoadingState, NotFoundState, QueryState } from './States';
 
 const query = (fields: { data?: string | null; error?: Error | null; isPending?: boolean }) =>

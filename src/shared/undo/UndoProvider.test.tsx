@@ -2,8 +2,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { act, fireEvent, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ApiError } from '../../api/errors';
-import { createTestQueryClient } from '../../test';
+import { ApiError } from '../lib/errors';
+import { createTestQueryClient } from '../test';
 import { useMoveFlash, UndoProvider, useToast, useUndo, type UndoAction } from './index';
 
 let run: (action: UndoAction) => void;
@@ -299,11 +299,11 @@ describe('UndoProvider', () => {
     setup();
     const card = document.createElement('article');
     card.dataset.card = 't1';
-    card.innerHTML = '<button class="kopen">Задача</button>';
+    card.innerHTML = '<a href="/tasks/t1">Задача</a>';
     document.body.append(card);
     act(() => run(makeAction({ flash: { to: 'work', taskId: 't1' } })));
     await advance(100);
-    expect(document.activeElement).toBe(card.querySelector('.kopen'));
+    expect(document.activeElement).toBe(card.querySelector('a'));
     card.remove();
   });
 

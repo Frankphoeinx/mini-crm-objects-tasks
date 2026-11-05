@@ -1,7 +1,7 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import { userMessage } from '../../api/errors';
+import { userMessage } from '../../lib/errors';
 import { paths } from '../../lib/routes';
 import { Icon, type IconName } from '../Icons';
 

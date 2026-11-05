@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useMe, userMessage, useUpdateTask, type BoardTask, type Profile, type TaskStatus } from '@/shared/api';
 import { buildBoard, canAssign, canClearAssignee, cx, delay, movesFor, type Move, type TaskFrom } from '@/shared/lib';
-import { ERROR_TOAST_MS, FOCUS_DELAY_MS, focusTask, Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
+import { FOCUS_DELAY_MS, focusTask, Icon, personOptions, Picker, Roll } from '@/shared/ui';
+import { ERROR_TOAST_MS, useMoveFlash, useToast } from '@/shared/undo';
+import { useRequestMove } from '@/entities/task';
 import { BoardCard, type CardMeta } from './BoardCard';
 import { useCardDrag } from './useCardDrag';
 import { useCardFlip } from './useCardFlip';

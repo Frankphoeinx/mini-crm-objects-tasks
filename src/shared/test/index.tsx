@@ -5,8 +5,8 @@ import type { ReactElement, ReactNode } from 'react';
 import { MemoryRouter } from 'react-router';
 import { MeProvider } from '../api/session';
 import { keys } from '../api/queries';
-import type { BoardTask, ObjectRow, Profile, TaskEvent } from '../api/types';
-import { UndoProvider } from '../ui/UndoProvider';
+import type { BoardTask, ObjectRow, Profile, TaskEvent } from '../lib/types';
+import { UndoProvider } from '../undo';
 
 export const manager: Profile = { id: 'u-anna', full_name: 'Анна Смирнова', role: 'manager' };
 export const worker: Profile = { id: 'u-petr', full_name: 'Пётр Иванов', role: 'worker' };

@@ -1,9 +1,9 @@
 import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { movesFor } from '../lib/status';
 import { supabase } from './client';
-import { unwrap } from './errors';
+import { unwrap } from '../lib/errors';
 import { useMe } from './session';
-import type { BoardTask, ObjectRow } from './types';
+import type { BoardTask, ObjectRow } from '../lib/types';
 
 export const keys = {
   tasks: ['tasks'] as const,

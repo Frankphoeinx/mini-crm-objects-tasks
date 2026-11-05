@@ -13,7 +13,8 @@ import {
   type Profile,
 } from '@/shared/api';
 import { isReturned, paths, readTaskFrom, usePageTitle } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundToObjects, QueriesState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
+import { DeleteDialog, Icon, NotFoundToObjects, QueriesState, ReturnedChip } from '@/shared/ui';
+import { RichTextEditor, RichTextView } from '@/entities/task';
 import { EditLine } from './EditLine';
 import { StatusRoute } from './StatusRoute';
 import { TaskActions } from './TaskActions';

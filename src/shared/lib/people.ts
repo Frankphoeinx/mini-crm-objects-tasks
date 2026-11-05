@@ -1,4 +1,4 @@
-import type { Profile, Role } from '../api/types';
+import type { Profile, Role } from './types';
 
 export const ROLE_LABEL: Record<Role, string> = { manager: 'Постановщик', worker: 'Исполнитель' };
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Role, TaskStatus } from '../api/types';
+import type { Role, TaskStatus } from './types';
 import { buildBoard, canAssign, canClearAssignee, columnOf, deniedMoveText, isReturned, movesFor } from './status';
 
 const anna = { id: 'anna', role: 'manager' as const };

@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
-import { COMMENT_REQUIRED, hasComment } from '../../lib/status';
-import { Dialog } from '../Dialog';
+import { COMMENT_REQUIRED, hasComment } from '@/shared/lib';
+import { Dialog } from '@/shared/ui';
 
 const TITLE = 'Вернуть на доработку';
 

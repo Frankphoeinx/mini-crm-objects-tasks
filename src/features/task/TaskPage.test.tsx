@@ -8,13 +8,13 @@ import { supabase } from '@/shared/api/client';
 import { formatDateTime, taskLinkState, type TaskFrom } from '@/shared/lib';
 import { createTestQueryClient, makeObject, makeTask, manager, otherWorker, worker } from '@/shared/test';
 import type { FakeSupabase } from '@/shared/test/fakeSupabase';
-import { UndoProvider } from '@/shared/ui';
+import { UndoProvider } from '@/shared/undo';
 import { routeMarks } from './StatusRoute';
 import { eventText } from './TaskHistory';
 import { TaskPage } from './TaskPage';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
-vi.mock('@/shared/ui/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
+vi.mock('@/entities/task/RichText', async () => (await import('@/shared/test/fakeRichText')).fakeRichTextModule());
 const fake = supabase as unknown as FakeSupabase;
 
 const north = makeObject();

@@ -6,7 +6,7 @@ import { createTestQueryClient, makeTask, manager, providers, worker } from '../
 import { supabase } from './client';
 import { useMoveTask } from './moves';
 import { keys } from './queries';
-import type { BoardTask, TaskEvent } from './types';
+import type { BoardTask, TaskEvent } from '../lib/types';
 
 vi.mock('@/shared/api/client', async () => (await import('@/shared/test/fakeSupabase')).fakeClientModule());
 const fake = supabase as unknown as FakeSupabase;

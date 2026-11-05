@@ -1,4 +1,4 @@
-import type { Profile } from '../../api/types';
+import type { Profile } from '../../lib/types';
 import { avatarClass, initialsOf } from '../../lib/people';
 import { Icon } from '../Icons';
 

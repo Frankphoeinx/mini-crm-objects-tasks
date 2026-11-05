@@ -3,7 +3,9 @@
 // Запуск: SUPABASE_URL=... SUPABASE_PUBLISHABLE_KEY=... DEMO_PASSWORD=... npm run test:contract
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { toApiError } from '../../src/shared/api/errors';
+import { toApiError } from '../../src/shared/lib/errors';
+
+declare const process: { env: Record<string, string | undefined> };
 
 const { SUPABASE_URL: url = '', SUPABASE_PUBLISHABLE_KEY: key = '', DEMO_PASSWORD: password = '' } = process.env;
 const NOWHERE = '00000000-0000-0000-0000-000000000000';
@@ -27,7 +29,9 @@ let board: Row[];
 beforeAll(async () => {
   expect(url && key && password, 'нужны SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, DEMO_PASSWORD').toBeTruthy();
   anon = client();
-  [anna, petr, sergey] = await Promise.all(['anna', 'petr', 'sergey'].map(signedIn));
+  anna = await signedIn('anna');
+  petr = await signedIn('petr');
+  sergey = await signedIn('sergey');
   annaId = (await anna.auth.getUser()).data.user?.id ?? '';
   petrId = (await petr.auth.getUser()).data.user?.id ?? '';
   board = (await anna.from('task_board').select('id,status,assignee_id')).data ?? [];

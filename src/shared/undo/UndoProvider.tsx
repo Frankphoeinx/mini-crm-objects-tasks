@@ -1,11 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, use, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { userMessage } from '../../api/errors';
-import { useLeaveGuard } from '../../lib/useLeaveGuard';
-import { FOCUS_DELAY_MS, focusTask } from '../focus';
-import { portalRoot } from '../portal';
-import { Toast } from '../Toast';
+import { userMessage } from '../lib/errors';
+import { useLeaveGuard } from '../lib/useLeaveGuard';
+import { FOCUS_DELAY_MS, focusTask, portalRoot, Toast } from '../ui';
 import { createUndoStore, type MoveFlash, type UndoStore } from './undoStore';
 
 const UndoContext = createContext<UndoStore | null>(null);

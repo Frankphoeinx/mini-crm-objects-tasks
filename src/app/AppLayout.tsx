@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, ViewTransition } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import { signOut, useMe, useMyTurnCount } from '@/shared/api';
 import { paths } from '@/shared/lib';
-import { Icon, useToast } from '@/shared/ui';
+import { Icon } from '@/shared/ui';
+import { useToast } from '@/shared/undo';
 import { activeTab, isWidePage } from './layoutState';
 
 export function AppLayout() {
