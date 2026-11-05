@@ -73,8 +73,11 @@ export function useCreateTask() {
 export function useUpdateTask() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: TaskPatch }) =>
-      unwrap(await supabase.from('tasks').update(patch).eq('id', id).select().single()),
+    mutationFn: async ({ id, patch, textVersion }: { id: string; patch: TaskPatch; textVersion?: number }) => {
+      const query = supabase.from('tasks').update(patch).eq('id', id);
+      // Текст успел измениться: база не найдёт такую строку, а правка другого постановщика останется цела.
+      return unwrap(await (textVersion === undefined ? query : query.eq('text_version', textVersion)).select().single());
+    },
     onSettled: (_data, _error, { id }) =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: keys.tasks }),

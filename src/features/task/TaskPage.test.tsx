@@ -203,6 +203,22 @@ describe('правка названия и описания', () => {
     expect(titleField()).toHaveValue('Залить фундамент');
   });
 
+  it('правка текста идёт с номером версии, смена исполнителя без него', async () => {
+    const user = userEvent.setup();
+    open({ task: makeTask({ text_version: 3 }) });
+    await user.type(titleField(), ' срочно{Enter}');
+    await waitFor(() => expect(fake.calls('tasks').filter((c) => c.method === 'eq').map((c) => c.args)).toContainEqual(['text_version', 3]));
+  });
+
+  it('текст успел изменить другой постановщик: понятный текст, набранное в поле', async () => {
+    const user = userEvent.setup();
+    open();
+    fake.respond('tasks', { data: null, error: { code: 'PGRST116', message: 'no rows' }, status: 406 });
+    await user.type(titleField(), ' срочно{Enter}');
+    expect(await screen.findByRole('status')).toHaveTextContent('только что изменил другой постановщик');
+    expect(titleField()).toHaveValue('Залить фундамент срочно');
+  });
+
   it('отказ базы показан, набранное не пропало и уходит при следующей попытке', async () => {
     const user = userEvent.setup();
     open();

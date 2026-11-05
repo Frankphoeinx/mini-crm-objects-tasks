@@ -23,6 +23,7 @@ export function makeTask(fields: Partial<BoardTask> = {}): BoardTask {
     author_id: manager.id,
     created_at: '2026-11-03T09:10:00Z',
     deleted_at: null,
+    text_version: 0,
     return_count: 0,
     last_return_comment: null,
     last_return_by: null,

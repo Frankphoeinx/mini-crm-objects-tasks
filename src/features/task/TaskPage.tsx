@@ -45,7 +45,7 @@ function TaskCard({ task, profiles, objects }: TaskCardProps) {
   const me = useMe();
   const location = useLocation();
   const navigate = useNavigate();
-  const { save } = useSaveTask(task.id);
+  const { save } = useSaveTask(task);
   const remove = useDeleteTask();
   const [deleting, setDeleting] = useState(false);
 

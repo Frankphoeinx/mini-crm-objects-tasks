@@ -279,7 +279,7 @@ describe('ObjectBoard: «Назначить»', () => {
     show([makeTask({ assignee_id: null })]);
     await userEvent.click(assignButton() as HTMLElement);
     await userEvent.click(screen.getByRole('option', { name: /Пётр Иванов/ }));
-    expect(await screen.findByRole('status')).toHaveTextContent('Это действие доступно постановщику');
+    await waitFor(() => expect(document.querySelector('[aria-live="polite"]')).toHaveTextContent('Это действие доступно постановщику'));
   });
 });
 

@@ -12,7 +12,8 @@
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
-    "gen:types": "npx supabase gen types typescript --local --schema public > .types.tmp && mv .types.tmp src/shared/api/database.generated.ts"
+    "gen:types": "npx supabase gen types typescript --local --schema public > .types.tmp && mv .types.tmp src/shared/api/database.generated.ts",
+    "test:contract": "vitest run --config vitest.contract.config.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0",
