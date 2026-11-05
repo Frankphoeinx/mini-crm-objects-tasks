@@ -208,7 +208,7 @@ describe('правка названия и описания', () => {
     open();
     fake.respond('tasks', refused);
     await user.type(titleField(), ' срочно{Enter}');
-    expect(await screen.findByText('Это действие доступно постановщику')).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Это действие доступно постановщику');
     expect(titleField()).toHaveValue('Залить фундамент срочно');
   });
 
@@ -291,7 +291,7 @@ describe('исполнитель и объект через список', () =>
     fake.respond('tasks', refused);
     await user.click(trigger('Исполнитель: Пётр Иванов'));
     await user.click(await option(/Сергей Козлов/));
-    expect(await screen.findByText('Это действие доступно постановщику')).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Это действие доступно постановщику');
     expect(await screen.findByRole('button', { name: 'Исполнитель: Пётр Иванов' })).toBeInTheDocument();
   });
 
@@ -519,7 +519,7 @@ describe('блок действий', () => {
       expect(within(actions()).queryByRole('textbox')).not.toBeInTheDocument();
 
       await advance(10_050);
-      expect(screen.getByText('Это действие доступно постановщику')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('Это действие доступно постановщику');
       expect(within(actions()).getByText('На проверке')).toHaveClass('act-st');
       expect(commentField()).toHaveValue('Ворота перекошены');
     });

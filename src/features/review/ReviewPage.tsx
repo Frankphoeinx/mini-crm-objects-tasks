@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useMe, useObjects, useProfiles, useReviewTasks, type BoardTask, type ObjectRow, type Profile } from '@/shared/api';
-import { delay, isReturned, movesFor, paths, shortName, taskLinkState, waveDelay } from '@/shared/lib';
-import { Icon, MoveButtons, QueriesState, ReturnedChip, useRequestMove } from '@/shared/ui';
+import { delay, isReturned, movesFor, paths, shortName, waveDelay, usePageTitle } from '@/shared/lib';
+import { Icon, MoveButtons, QueriesState, ReturnedChip, TaskLink, useRequestMove } from '@/shared/ui';
 
 function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects: ObjectRow[]; profiles: Profile[] }) {
   const me = useMe();
@@ -23,11 +23,7 @@ function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects:
           return (
             <article key={task.id} className={returned ? 'kcard w is-returned' : 'kcard w'} data-card={task.id} style={delay(waveDelay(i))}>
               <span className="kfx" aria-hidden="true"></span>
-              <Link className="kopen" to={paths.task(task.id)} state={taskLinkState('review')}>
-                <span className="vt" style={{ display: 'block', viewTransitionName: `floor-${task.id}` }}>
-                  {task.title}
-                </span>
-              </Link>
+              <TaskLink id={task.id} title={task.title} from="review" />
               {returned && <ReturnedChip />}
               <span className="kmeta">
                 <Icon name="pin" />
@@ -48,6 +44,7 @@ function ReviewList({ tasks, objects, profiles }: { tasks: BoardTask[]; objects:
 }
 
 export function ReviewPage() {
+  usePageTitle('Ждут проверки');
   const tasks = useReviewTasks();
   const objects = useObjects();
   const profiles = useProfiles();

@@ -74,7 +74,7 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
           </div>
           <div className="field">
             <label htmlFor="bs-tobj">Объект</label>
-            <button id="bs-tobj" type="button" className="pick-trigger" aria-haspopup="listbox" onClick={(e) => setPicking({ kind: 'object', anchor: e.currentTarget })}>
+            <button id="bs-tobj" type="button" className="pick-trigger" aria-haspopup="listbox" aria-expanded={picking?.kind === 'object'} aria-label={`Объект: ${objects.find((o) => o.id === placeId)?.name ?? ''}`} onClick={(e) => setPicking({ kind: 'object', anchor: e.currentTarget })}>
               <Avatar place />
               <span>{objects.find((o) => o.id === placeId)?.name}</span>
               <Icon name="down" />
@@ -82,7 +82,7 @@ export function CreateTaskDialog({ objectId, objects, people, onClose }: CreateT
           </div>
           <div className="field">
             <label htmlFor="bs-tuser">Исполнитель</label>
-            <button id="bs-tuser" type="button" className="pick-trigger" aria-haspopup="listbox" onClick={(e) => setPicking({ kind: 'person', anchor: e.currentTarget })}>
+            <button id="bs-tuser" type="button" className="pick-trigger" aria-haspopup="listbox" aria-expanded={picking?.kind === 'person'} aria-label={`Исполнитель: ${fullName(people, assigneeId || null)}`} onClick={(e) => setPicking({ kind: 'person', anchor: e.currentTarget })}>
               <Avatar person={people.find((p) => p.id === assigneeId) ?? null} />
               <span>{fullName(people, assigneeId || null)}</span>
               <Icon name="down" />

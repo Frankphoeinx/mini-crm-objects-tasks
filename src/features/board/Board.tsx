@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useMe, userMessage, useUpdateTask, type BoardTask, type Profile, type TaskStatus } from '@/shared/api';
-import { buildBoard, canAssign, canClearAssignee, delay, movesFor, paths, taskLinkState, type Move, type TaskFrom } from '@/shared/lib';
+import { buildBoard, canAssign, canClearAssignee, cx, delay, movesFor, type Move, type TaskFrom } from '@/shared/lib';
 import { ERROR_TOAST_MS, FOCUS_DELAY_MS, focusTask, Icon, personOptions, Picker, Roll, useMoveFlash, useRequestMove, useToast } from '@/shared/ui';
-import { BoardCard, cx, type CardMeta } from './BoardCard';
+import { BoardCard, type CardMeta } from './BoardCard';
 import { useCardDrag } from './useCardDrag';
 import { useCardFlip } from './useCardFlip';
 
@@ -110,8 +110,7 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
                         dragging={drag.draggingId === task.id}
                         landed={flash.taskId === task.id}
                         dragProps={drag.cardProps(task, moves)}
-                        to={paths.task(task.id)}
-                        linkState={taskLinkState(from)}
+                        from={from}
                         onMove={(chosen) => move(task, chosen)}
                         onTarget={setTarget}
                         onAssign={people && canAssign(task, me) ? (anchor) => setAssigning({ task, anchor }) : undefined}

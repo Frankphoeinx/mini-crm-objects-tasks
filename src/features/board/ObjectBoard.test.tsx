@@ -279,7 +279,7 @@ describe('ObjectBoard: «Назначить»', () => {
     show([makeTask({ assignee_id: null })]);
     await userEvent.click(assignButton() as HTMLElement);
     await userEvent.click(screen.getByRole('option', { name: /Пётр Иванов/ }));
-    expect(await screen.findByText('Это действие доступно постановщику')).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Это действие доступно постановщику');
   });
 });
 
@@ -313,8 +313,8 @@ describe('Окно создания задачи', () => {
   it('по умолчанию этот объект и без исполнителя, текст без лишних пробелов, после сохранения закрывается', async () => {
     show([makeTask()]);
     await open();
-    expect(screen.getByRole('button', { name: 'Объект' })).toHaveTextContent('ЖК Северный');
-    expect(screen.getByRole('button', { name: 'Исполнитель' })).toHaveTextContent('Не назначен');
+    expect(screen.getByRole('button', { name: /^Объект:/ })).toHaveTextContent('ЖК Северный');
+    expect(screen.getByRole('button', { name: /^Исполнитель:/ })).toHaveTextContent('Не назначен');
 
     await userEvent.type(screen.getByLabelText('Название'), '  Новая стена ');
     await userEvent.type(screen.getByLabelText('Описание'), ' Кирпич ');
@@ -361,15 +361,22 @@ describe('Окно создания задачи', () => {
     show([makeTask()]);
     await open();
     await userEvent.type(screen.getByLabelText('Название'), 'Стена');
-    await userEvent.click(screen.getByRole('button', { name: 'Объект' }));
+    await userEvent.click(screen.getByRole('button', { name: /^Объект:/ }));
     await userEvent.click(screen.getByRole('option', { name: /Склад на Южной/ }));
-    await userEvent.click(screen.getByRole('button', { name: 'Исполнитель' }));
+    await userEvent.click(screen.getByRole('button', { name: /^Исполнитель:/ }));
     await userEvent.click(screen.getByRole('option', { name: /Сергей Козлов/ }));
 
-    expect(screen.getByRole('button', { name: 'Объект' })).toHaveTextContent('Склад на Южной');
-    expect(screen.getByRole('button', { name: 'Исполнитель' })).toHaveTextContent('Сергей Козлов');
+    expect(screen.getByRole('button', { name: /^Объект:/ })).toHaveTextContent('Склад на Южной');
+    expect(screen.getByRole('button', { name: /^Исполнитель:/ })).toHaveTextContent('Сергей Козлов');
     await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
     await waitFor(() => expect(inserted()).toMatchObject({ object_id: 'o2', assignee_id: otherWorker.id }));
+  });
+
+  it('диктор слышит выбранное значение, а не только подпись поля', async () => {
+    show([makeTask()]);
+    await userEvent.click(screen.getByRole('button', { name: 'Создать задачу' }));
+    expect(screen.getByRole('button', { name: 'Объект: ЖК Северный' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Исполнитель: Не назначен' })).toBeInTheDocument();
   });
 
   it('ввод во время сохранения не даёт отправить окно второй раз', async () => {

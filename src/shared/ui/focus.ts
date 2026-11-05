@@ -9,4 +9,6 @@ export function focusTask(taskId: string) {
     document.querySelector<HTMLElement>('.tk-act .btn') ??
     document.querySelector<HTMLElement>('main');
   target?.focus({ preventScroll: true });
+  // С клавиатуры фокус должен быть виден. Мышью и касанием экран не дёргаем.
+  if (target?.matches(':focus-visible')) target.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
 }

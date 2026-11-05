@@ -272,6 +272,15 @@ describe('UndoProvider', () => {
     expect(screen.getByRole('button', { name: 'Отменить' })).toBeTruthy();
   });
 
+  it('живая область есть заранее, текст приходит в неё для диктора', () => {
+    setup();
+    const region = document.querySelector('[aria-live="polite"]');
+    expect(region).toBeEmptyDOMElement();
+    act(() => run(makeAction()));
+    expect(document.querySelector('[aria-live="polite"]')).toBe(region);
+    expect(region).toHaveTextContent('Задача теперь «В работе»');
+  });
+
   it('окно отмены открыто: браузер предупреждает при закрытии вкладки', () => {
     setup();
     const leaving = () => {

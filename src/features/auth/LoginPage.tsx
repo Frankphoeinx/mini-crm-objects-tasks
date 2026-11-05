@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { INVALID_CREDENTIALS_ERROR, signIn } from '@/shared/api';
-import { delay } from '@/shared/lib';
+import { delay, usePageTitle } from '@/shared/lib';
 import { Crane, Icon, type IconName } from '@/shared/ui';
 
 const DEMO_ACCOUNTS: { email: string; name: string; roleLabel: string; icon: IconName }[] = [
@@ -19,6 +19,7 @@ const STEPS: { icon: IconName; title: string; text: string; delay: string }[] = 
 const ERROR_ID = 'bs-login-err';
 
 export function LoginPage() {
+  usePageTitle('Вход');
   const demoPassword = import.meta.env.VITE_DEMO_PASSWORD;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

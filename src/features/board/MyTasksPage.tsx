@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useMe, useMyTasks, useMyTurnCount, useObjects, useProfiles, useReviewTasks, type BoardTask, type ObjectRow } from '@/shared/api';
-import { delay, paths } from '@/shared/lib';
-import { EmptyState, Icon, QueriesState, ReviewTile, Roll } from '@/shared/ui';
+import { paths, usePageTitle } from '@/shared/lib';
+import { EmptyState, Icon, QueriesState, ReviewTile, TurnTile } from '@/shared/ui';
 import { Board } from './Board';
 
 function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] }) {
@@ -30,13 +30,7 @@ function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] 
         </div>
         <ReviewTile hero waiting={waiting} />
         <div className="hero-side">
-          <div className="tile t-orange w" style={delay('50ms')}>
-            <span className="lbl">Ваш ход</span>
-            <span className="turn-n">
-              <Roll value={turn} />
-            </span>
-            <span className="lbl o-more">Ждут вашего действия</span>
-          </div>
+          <TurnTile turn={turn} />
         </div>
       </section>
       {tasks.length === 0 ? (
@@ -58,6 +52,7 @@ function MyTasks({ tasks, objects }: { tasks: BoardTask[]; objects: ObjectRow[] 
 }
 
 export function MyTasksPage() {
+  usePageTitle('Мои задачи');
   const tasks = useMyTasks();
   const objects = useObjects();
   // Здесь имена не нужны, но без них первое открытие задачи покажет загрузку вместо полёта заголовка.

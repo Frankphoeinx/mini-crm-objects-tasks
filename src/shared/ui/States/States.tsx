@@ -1,6 +1,8 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { Link } from 'react-router';
 import { userMessage } from '../../api/errors';
+import { paths } from '../../lib/routes';
 import { Icon, type IconName } from '../Icons';
 
 // Состояния экрана собраны из плитки .empty: новых стилей нет.
@@ -51,6 +53,19 @@ type QueryStateProps<T> = {
   notFound?: ReactNode;
   children: (data: T) => ReactNode;
 };
+
+/** «Здесь ничего нет» с дорогой назад к списку объектов. */
+export function NotFoundToObjects({ label = 'К объектам' }: { label?: string }) {
+  return (
+    <NotFoundState
+      action={
+        <Link className="btn is-primary" to={paths.objects}>
+          {label}
+        </Link>
+      }
+    />
+  );
+}
 
 type QueriesStateProps<T extends [unknown, ...unknown[]]> = {
   queries: { [K in keyof T]: QueryStateProps<T[K]>['query'] };

@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ApiError, useDeleteObject, useMe, useObject, useObjectTasks, userMessage, type BoardTask, type ObjectRow } from '@/shared/api';
-import { delay, movesFor, paths, plural } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueryState, ReviewTile, Roll, useMoveFlash } from '@/shared/ui';
+import { movesFor, paths, plural, usePageTitle } from '@/shared/lib';
+import { DeleteDialog, Icon, NotFoundToObjects, QueryState, ReviewTile, TurnTile, useMoveFlash } from '@/shared/ui';
 import { ObjectDialog } from './ObjectDialog';
 import { objectStats, ReadyTile } from './SummaryTiles';
 
@@ -27,6 +27,7 @@ function DeleteObjectDialog({ object, tasks, onClose }: { object: ObjectRow; tas
 }
 
 function ObjectHero({ object }: { object: ObjectRow }) {
+  usePageTitle(object.name);
   const me = useMe();
   const { data: tasks } = useObjectTasks(object.id);
   const { to } = useMoveFlash();
@@ -93,13 +94,7 @@ function ObjectHero({ object }: { object: ObjectRow }) {
           <ReadyTile hero total={stats.count} accepted={stats.accepted} flash={to === 'accepted'} viewTransitionName={`bld-${object.id}`} />
           {!me.isManager && (
             <div className="hero-side">
-              <div className="tile t-orange w" style={delay('75ms')}>
-                <span className="lbl">Ваш ход</span>
-                <span className="turn-n">
-                  <Roll value={turn} />
-                </span>
-                <span className="lbl o-more">Ждут вашего действия</span>
-              </div>
+              <TurnTile turn={turn} d="75ms" />
             </div>
           )}
         </>
@@ -113,15 +108,7 @@ function ObjectHero({ object }: { object: ObjectRow }) {
 /** Страница объекта: шапка, затем доска из board. key={objectId} ставит роутер. */
 export function ObjectPage({ objectId, board }: { objectId: string; board: ReactNode }) {
   const object = useObject(objectId);
-  const notFound = (
-    <NotFoundState
-      action={
-        <Link className="btn is-primary" to={paths.objects}>
-          Все объекты
-        </Link>
-      }
-    />
-  );
+  const notFound = <NotFoundToObjects label="Все объекты" />;
   // Адрес с неверным id база отклоняет ошибкой: для человека это то же «не найдено», повтор не поможет.
   if (object.error instanceof ApiError && object.error.kind === 'not-found') return notFound;
   return (

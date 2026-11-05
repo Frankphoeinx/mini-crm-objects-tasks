@@ -25,6 +25,8 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   const [store] = useState(() => createUndoStore(userMessage));
   const { undo, toast, flash } = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
+  const announcement = [undo?.text, toast].filter(Boolean).join('. ');
+
   useEffect(() => store.dispose, [store]);
   // Смена статуса уходит в базу после окна отмены: закрытие вкладки её снимет, поэтому браузер спросит.
   useLeaveGuard(() => store.getSnapshot().undo !== null);
@@ -49,12 +51,15 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   return (
     <UndoContext value={store}>
       {children}
-      {(undo || toast) &&
-        createPortal(
+      {createPortal(
           <>
+            {/* Область живёт постоянно: иначе диктор может пропустить текст, появившийся вместе с ней. */}
+            <div className="sr" aria-live="polite" aria-atomic="true" role={announcement ? 'status' : undefined}>
+              {announcement}
+            </div>
             {undo && (
-              <div className="toast undo" role="status">
-                <span>{undo.text}</span>
+              <div className="toast undo">
+                <span aria-hidden="true">{undo.text}</span>
                 <button className="undo-btn" type="button" onClick={store.undo}>
                   Отменить
                 </button>

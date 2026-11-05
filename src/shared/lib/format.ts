@@ -3,6 +3,11 @@ import type { CSSProperties } from 'react';
 /** Задержка волны появления (.w). */
 export const delay = (d: string) => ({ '--d': d }) as CSSProperties;
 
+/** Имя класса из условий: cx('a', on && 'b'). */
+export function cx(...names: (string | false)[]) {
+  return names.filter(Boolean).join(' ');
+}
+
 /** plural(3, 'задача', 'задачи', 'задач') даёт «3 задачи». */
 export function plural(n: number, one: string, few: string, many: string) {
   const a = n % 10;

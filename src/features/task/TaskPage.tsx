@@ -12,8 +12,8 @@ import {
   type ObjectRow,
   type Profile,
 } from '@/shared/api';
-import { isReturned, paths, readTaskFrom } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueriesState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
+import { isReturned, paths, readTaskFrom, usePageTitle } from '@/shared/lib';
+import { DeleteDialog, Icon, NotFoundToObjects, QueriesState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
 import { EditLine } from './EditLine';
 import { StatusRoute } from './StatusRoute';
 import { TaskActions } from './TaskActions';
@@ -27,15 +27,7 @@ export function TaskPage({ taskId }: { taskId: string }) {
   const profiles = useProfiles();
   const objects = useObjects();
 
-  const notFound = (
-    <NotFoundState
-      action={
-        <Link className="btn is-primary" to={paths.objects}>
-          К объектам
-        </Link>
-      }
-    />
-  );
+  const notFound = <NotFoundToObjects />;
   // Адрес с id не того вида база отвергает ошибкой, но для человека задачи просто нет.
   if (task.error instanceof ApiError && task.error.kind === 'not-found') return notFound;
 
@@ -49,6 +41,7 @@ export function TaskPage({ taskId }: { taskId: string }) {
 type TaskCardProps = { task: BoardTask; profiles: Profile[]; objects: ObjectRow[] };
 
 function TaskCard({ task, profiles, objects }: TaskCardProps) {
+  usePageTitle(task.title);
   const me = useMe();
   const location = useLocation();
   const navigate = useNavigate();
