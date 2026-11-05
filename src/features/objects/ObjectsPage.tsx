@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { useBoardTasks, useMe, useMyTurnCount, useObjects, type BoardTask, type ObjectRow } from '@/shared/api';
 import { delay, paths, percent, plural, ratio, waveDelay } from '@/shared/lib';
-import { Building, Icon, QueryState, ReviewTile, Roll, Tape } from '@/shared/ui';
+import { Building, Icon, QueriesState, ReviewTile, Roll, Tape } from '@/shared/ui';
 import { ObjectDialog } from './ObjectDialog';
 import { objectStats, ReadyTile } from './SummaryTiles';
 
 function ObjectTile({ object, tasks, index }: { object: ObjectRow; tasks: BoardTask[]; index: number }) {
-  const navigate = useNavigate();
   const { count, accepted, waiting, hasRework } = objectStats(tasks);
   return (
-    <button className="tile obj lift w" type="button" style={delay(waveDelay(index + 2))} onClick={() => navigate(paths.object(object.id))}>
+    <Link className="tile obj lift w" to={paths.object(object.id)} style={delay(waveDelay(index + 2))}>
       <span className="art-clip" aria-hidden="true">
         <span className="earth"></span>
         <span className="obj-art art">
@@ -46,13 +45,12 @@ function ObjectTile({ object, tasks, index }: { object: ObjectRow; tasks: BoardT
         </span>
         <Tape value={ratio(accepted, count)} />
       </span>
-    </button>
+    </Link>
   );
 }
 
 function ObjectsContent({ objects, tasks }: { objects: ObjectRow[]; tasks: BoardTask[] }) {
   const me = useMe();
-  const navigate = useNavigate();
   const turn = useMyTurnCount();
   const [adding, setAdding] = useState(false);
   const summary = objectStats(tasks);
@@ -61,7 +59,7 @@ function ObjectsContent({ objects, tasks }: { objects: ObjectRow[]; tasks: Board
     <>
       <div className="sum">
         {!me.isManager && (
-          <button className="tile t-orange lift w" type="button" onClick={() => navigate(paths.my)}>
+          <Link className="tile t-orange lift w" to={paths.my}>
             <span className="lbl">Ваш ход</span>
             <span className="turn-n">
               <Roll value={turn} />
@@ -69,7 +67,7 @@ function ObjectsContent({ objects, tasks }: { objects: ObjectRow[]; tasks: Board
             <span className="o-title o-more" style={{ marginTop: 0 }}>
               Открыть мои задачи
             </span>
-          </button>
+          </Link>
         )}
         <ReviewTile waiting={summary.waiting} />
         <ReadyTile total={summary.count} accepted={summary.accepted} />
@@ -112,9 +110,7 @@ export function ObjectsPage() {
   return (
     <section className="objs">
       <h1 className="page-h w">Объекты</h1>
-      <QueryState query={objects}>
-        {(objectRows) => <QueryState query={tasks}>{(taskRows) => <ObjectsContent objects={objectRows} tasks={taskRows} />}</QueryState>}
-      </QueryState>
+      <QueriesState queries={[objects, tasks]}>{(objectRows, taskRows) => <ObjectsContent objects={objectRows} tasks={taskRows} />}</QueriesState>
     </section>
   );
 }

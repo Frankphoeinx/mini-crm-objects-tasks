@@ -17,6 +17,26 @@ function heldSave() {
 }
 
 describe('EditLine: правка на месте', () => {
+  it('уход с экрана без выхода из поля: правка не теряется и не уходит дважды', async () => {
+    const save = vi.fn(async () => {});
+    const view = render(<EditLine aria-label="Поле" value="Старое" onSave={save} />);
+    const user = userEvent.setup();
+    await user.type(screen.getByRole('textbox', { name: 'Поле' }), ' и новое');
+    view.unmount();
+    expect(save).toHaveBeenCalledExactlyOnceWith('Старое и новое');
+  });
+
+  it.each([
+    [' и новое', true],
+    ['', false],
+  ])('закрытие вкладки с набранным %j: браузер предупреждает: %s', async (typed, warns) => {
+    render(<EditLine aria-label="Поле" value="Старое" onSave={vi.fn(async () => {})} />);
+    if (typed) await userEvent.setup().type(screen.getByRole('textbox', { name: 'Поле' }), typed);
+    const leave = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(leave);
+    expect(leave.defaultPrevented).toBe(warns);
+  });
+
   it('сохраняет при уходе из поля, без пробелов по краям', async () => {
     const t = setup();
     await t.user.clear(t.field);

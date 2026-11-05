@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import {
   ApiError,
   useDeleteTask,
@@ -13,7 +13,7 @@ import {
   type Profile,
 } from '@/shared/api';
 import { isReturned, paths, readTaskFrom } from '@/shared/lib';
-import { DeleteDialog, Icon, NotFoundState, QueryState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
+import { DeleteDialog, Icon, NotFoundState, QueriesState, ReturnedChip, RichTextEditor, RichTextView } from '@/shared/ui';
 import { EditLine } from './EditLine';
 import { StatusRoute } from './StatusRoute';
 import { TaskActions } from './TaskActions';
@@ -26,14 +26,13 @@ export function TaskPage({ taskId }: { taskId: string }) {
   const task = useTask(taskId);
   const profiles = useProfiles();
   const objects = useObjects();
-  const navigate = useNavigate();
 
   const notFound = (
     <NotFoundState
       action={
-        <button className="btn is-primary" type="button" onClick={() => navigate(paths.objects)}>
+        <Link className="btn is-primary" to={paths.objects}>
           К объектам
-        </button>
+        </Link>
       }
     />
   );
@@ -41,15 +40,9 @@ export function TaskPage({ taskId }: { taskId: string }) {
   if (task.error instanceof ApiError && task.error.kind === 'not-found') return notFound;
 
   return (
-    <QueryState query={task} notFound={notFound}>
-      {(row) => (
-        <QueryState query={profiles}>
-          {(people) => (
-            <QueryState query={objects}>{(places) => <TaskCard task={row} profiles={people} objects={places} />}</QueryState>
-          )}
-        </QueryState>
-      )}
-    </QueryState>
+    <QueriesState queries={[task, profiles, objects]} notFound={notFound}>
+      {(row, people, places) => <TaskCard task={row} profiles={people} objects={places} />}
+    </QueriesState>
   );
 }
 
@@ -80,10 +73,10 @@ function TaskCard({ task, profiles, objects }: TaskCardProps) {
         <div className="tile tk-title w">
           <span className="fx" aria-hidden="true"></span>
           <div className="tk-bar">
-            <button className="back" type="button" onClick={() => navigate(back.path)}>
+            <Link className="back" to={back.path}>
               <Icon name="back" />
               {back.label}
-            </button>
+            </Link>
             {isReturned(task) && <ReturnedChip />}
             {me.isManager && (
               <div className="tk-manage">

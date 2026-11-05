@@ -2,6 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createContext, use, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { userMessage } from '../../api/errors';
+import { useLeaveGuard } from '../../lib/useLeaveGuard';
+import { FOCUS_DELAY_MS, focusTask } from '../focus';
 import { portalRoot } from '../portal';
 import { Toast } from '../Toast';
 import { createUndoStore, type MoveFlash, type UndoStore } from './undoStore';
@@ -21,9 +23,19 @@ function useStore() {
 export function UndoProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [store] = useState(() => createUndoStore(userMessage));
-  const { undo, toast } = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const { undo, toast, flash } = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
   useEffect(() => store.dispose, [store]);
+  // Смена статуса уходит в базу после окна отмены: закрытие вкладки её снимет, поэтому браузер спросит.
+  useLeaveGuard(() => store.getSnapshot().undo !== null);
+
+  // Кнопка перехода уходит вместе с карточкой, кнопка «Отменить» вместе с полосой отмены.
+  useEffect(() => {
+    const { taskId } = flash;
+    if (!taskId) return;
+    const timer = setTimeout(() => focusTask(taskId), FOCUS_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [flash]);
 
   // Возврат на вкладку и чужие правки перезагружают данные: действие в окне отмены не должно пропасть с экрана.
   useEffect(

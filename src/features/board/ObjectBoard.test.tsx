@@ -137,7 +137,7 @@ describe('ObjectBoard: колонки', () => {
 describe('ObjectBoard: карточка', () => {
   it('название открывает задачу с отметкой «с объекта»', async () => {
     show([makeTask()]);
-    await userEvent.click(screen.getByRole('button', { name: 'Залить фундамент' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Залить фундамент' }));
     expect(JSON.parse(screen.getByTestId('where').textContent)).toEqual({ pathname: '/tasks/t1', state: { from: 'object' } });
   });
 
@@ -257,6 +257,14 @@ describe('ObjectBoard: «Назначить»', () => {
     await waitFor(() => expect(fake.calls('tasks').find((c) => c.method === 'update')?.args).toEqual([{ assignee_id: worker.id }]));
     expect(fake.calls('tasks').find((c) => c.method === 'eq')?.args).toEqual(['id', 't1']);
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('после назначения кнопка исчезает, фокус переходит на название карточки', async () => {
+    show([makeTask({ assignee_id: null })]);
+    await userEvent.click(assignButton() as HTMLElement);
+    fake.respond('task_board', { data: [makeTask({ assignee_id: worker.id })] });
+    await userEvent.click(screen.getByRole('option', { name: /Пётр Иванов/ }));
+    await waitFor(() => expect(within(card('t1')).getByRole('link', { name: 'Залить фундамент' })).toHaveFocus());
   });
 
   it('«Не назначен» у задачи без исполнителя ничего не отправляет', async () => {

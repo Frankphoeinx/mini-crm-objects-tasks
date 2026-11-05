@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMe, useObjects, useObjectTasks, useProfiles, type BoardTask, type ObjectRow, type Profile } from '@/shared/api';
 import { shortName } from '@/shared/lib';
-import { EmptyState, QueryState } from '@/shared/ui';
+import { EmptyState, QueriesState } from '@/shared/ui';
 import { Board } from './Board';
 import { CreateTaskDialog } from './CreateTaskDialog';
 
@@ -42,12 +42,8 @@ export function ObjectBoard({ objectId }: { objectId: string }) {
   const objects = useObjects();
 
   return (
-    <QueryState query={tasks}>
-      {(rows) => (
-        <QueryState query={profiles}>
-          {(people) => <QueryState query={objects}>{(places) => <LoadedBoard objectId={objectId} tasks={rows} people={people} objects={places} />}</QueryState>}
-        </QueryState>
-      )}
-    </QueryState>
+    <QueriesState queries={[tasks, profiles, objects]}>
+      {(rows, people, places) => <LoadedBoard objectId={objectId} tasks={rows} people={people} objects={places} />}
+    </QueriesState>
   );
 }

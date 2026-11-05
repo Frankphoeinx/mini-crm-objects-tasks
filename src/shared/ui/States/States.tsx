@@ -52,12 +52,30 @@ type QueryStateProps<T> = {
   children: (data: T) => ReactNode;
 };
 
-/** Загрузка, ошибка с повтором, не найдено, данные. Ошибка фонового обновления не прячет уже показанные данные. */
-export function QueryState<T>({ query, notFound, children }: QueryStateProps<T>) {
-  if (query.data === undefined) {
-    if (query.error) return <ErrorState error={query.error} onRetry={() => void query.refetch()} />;
-    return <LoadingState />;
+type QueriesStateProps<T extends [unknown, ...unknown[]]> = {
+  queries: { [K in keyof T]: QueryStateProps<T[K]>['query'] };
+  notFound?: ReactNode;
+  children: (...data: T) => ReactNode;
+};
+
+/** Загрузка, ошибка с повтором, не найдено, данные. Запросы смотрим по порядку. Ошибка фонового обновления не прячет уже показанные данные. */
+export function QueriesState<T extends [unknown, ...unknown[]]>({ queries, notFound, children }: QueriesStateProps<T>) {
+  const list = queries as QueryStateProps<unknown>['query'][];
+  for (const query of list) {
+    if (query.data === undefined) {
+      if (query.error) return <ErrorState error={query.error} onRetry={() => void query.refetch()} />;
+      return <LoadingState />;
+    }
+    if (query.data === null) return notFound ?? <NotFoundState />;
   }
-  if (query.data === null) return notFound ?? <NotFoundState />;
-  return children(query.data);
+  return children(...(list.map((query) => query.data) as T));
+}
+
+/** Один запрос: то же, что QueriesState. */
+export function QueryState<T>({ query, notFound, children }: QueryStateProps<T>) {
+  return (
+    <QueriesState<[T]> queries={[query]} notFound={notFound}>
+      {children}
+    </QueriesState>
+  );
 }

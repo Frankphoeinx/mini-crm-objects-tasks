@@ -1,6 +1,6 @@
 -- Матрица переходов и смена статуса.
 begin;
-select plan(151);
+select plan(154);
 \ir fixture.psql
 
 -- Пробует переход и возвращает 'ok' или код ошибки. Откат подтранзакции возвращает и роль, и данные.
@@ -61,7 +61,7 @@ begin
         end;
         v_expected := case
           when v_who.who = 'anon' then '42501'
-          when not v_who.is_manager and not v_who.is_assignee then 'P0002'
+          when not v_who.is_manager and not v_who.is_assignee then 'PT404'
           when v_rule is null then 'P0001'
           when v_rule = 'assignee' and v_who.is_assignee then 'ok'
           when v_rule = 'manager' and v_who.is_manager then 'ok'
@@ -101,7 +101,7 @@ select throws_ok(
 );
 select throws_ok(
   $$ select public.change_task_status(gen_random_uuid(), 'work') $$,
-  'P0002', 'Задача не найдена', 'несуществующая задача'
+  'PT404', 'Задача не найдена', 'несуществующая задача'
 );
 select throws_ok(
   $$ select public.change_task_status(pg_temp.id('task-free'), 'work') $$,
@@ -119,7 +119,7 @@ select throws_ok(
   '23514', 'Напишите, что нужно исправить: без комментария вернуть нельзя.',
   'возврат без комментария: ' || label
 )
-from (values (null, 'NULL'), ('', 'пустая строка'), ('   ', 'пробелы'), (E'\n\t ', 'переводы строк и табуляция')) as v (c, label);
+from (values (null, 'NULL'), ('', 'пустая строка'), ('   ', 'пробелы'), (E'\u200b', 'невидимый символ'), (E'\u00a0', 'неразрывный пробел'), ('.', 'одна точка'), (E'\n\t ', 'переводы строк и табуляция')) as v (c, label);
 
 select pg_temp.logout();
 select is(
@@ -136,18 +136,18 @@ select throws_ok(
 select pg_temp.login('w2');
 select throws_ok(
   $$ select public.change_task_status(pg_temp.id('task-a'), 'accepted') $$,
-  'P0002', 'Задача не найдена', 'чужой исполнитель не узнаёт, что задача существует'
+  'PT404', 'Задача не найдена', 'чужой исполнитель не узнаёт, что задача существует'
 );
 select throws_ok(
   $$ select public.change_task_status(pg_temp.id('task-free'), 'work') $$,
-  'P0002', 'Задача не найдена', 'исполнитель не видит задачу без исполнителя'
+  'PT404', 'Задача не найдена', 'исполнитель не видит задачу без исполнителя'
 );
 
 -- Вошедший без профиля не имеет никаких прав.
 select pg_temp.login('ghost');
 select throws_ok(
   $$ select public.change_task_status(pg_temp.id('task-a'), 'accepted') $$,
-  'P0002', 'Задача не найдена', 'пользователь без профиля'
+  'PT404', 'Задача не найдена', 'пользователь без профиля'
 );
 
 -- Роль только из profiles: подделанные метаданные в токене не помогают.

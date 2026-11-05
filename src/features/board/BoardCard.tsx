@@ -1,4 +1,5 @@
 import type { CSSProperties, DragEvent } from 'react';
+import { Link } from 'react-router';
 import type { BoardTask, TaskStatus } from '@/shared/api';
 import { isReturned, type Move } from '@/shared/lib';
 import { Icon, MoveButtons, ReturnedChip, type IconName } from '@/shared/ui';
@@ -16,7 +17,9 @@ type BoardCardProps = {
   dragging: boolean;
   landed: boolean;
   dragProps: { onDragStart(e: DragEvent): void; onDragEnd(e: DragEvent): void };
-  onOpen: () => void;
+  /** Адрес страницы задачи и откуда на неё пришли. */
+  to: string;
+  linkState: unknown;
   onMove: (move: Move) => void;
   /** Наведение на кнопку подсвечивает колонку-цель. */
   onTarget: (to: TaskStatus | null) => void;
@@ -29,7 +32,7 @@ export function cx(...names: (string | false)[]) {
   return names.filter(Boolean).join(' ');
 }
 
-export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, dragProps, onOpen, onMove, onTarget, onAssign, assignBusy }: BoardCardProps) {
+export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, dragProps, to, linkState, onMove, onTarget, onAssign, assignBusy }: BoardCardProps) {
   const needsMe = moves.length > 0;
   const returned = isReturned(task);
   return (
@@ -38,7 +41,16 @@ export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, d
       data-card={task.id}
       draggable={needsMe}
       style={{ '--d': delay } as CSSProperties}
-      {...(needsMe ? dragProps : {})}
+      {...(needsMe
+        ? {
+            ...dragProps,
+            // Пока начинался перенос, курсор мог пройти над кнопкой: mouseleave с неё во время переноса не придёт.
+            onDragStart(e: DragEvent) {
+              onTarget(null);
+              dragProps.onDragStart(e);
+            },
+          }
+        : {})}
     >
       <span className="kfx" aria-hidden="true"></span>
       {needsMe && (
@@ -46,11 +58,12 @@ export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, d
           <path d="M10 0V14M6 14h8l-1 4H7zM10 18v3a4.5 4.5 0 1 1-4.5 4.5"></path>
         </svg>
       )}
-      <button className="kopen" type="button" onClick={onOpen}>
+      {/* draggable: тянется вся карточка, а не ссылка. */}
+      <Link className="kopen" to={to} state={linkState} draggable={false}>
         <span className="vt" style={{ display: 'block', viewTransitionName: `floor-${task.id}` }}>
           {task.title}
         </span>
-      </button>
+      </Link>
       <span className="kmeta">
         <Icon name={meta.icon} />
         {meta.text}

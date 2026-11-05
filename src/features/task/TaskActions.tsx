@@ -1,6 +1,6 @@
-import { useRef, useState, type CSSProperties } from 'react';
+import { useRef, useState } from 'react';
 import { useMe, useMoveTask, type BoardTask, type Profile } from '@/shared/api';
-import { COMMENT_REQUIRED, formatDateTime, fullName, isReturned, movesFor, shortName, STATUS_LABEL, type Move } from '@/shared/lib';
+import { COMMENT_REQUIRED, delay, formatDateTime, fullName, hasComment, isReturned, movesFor, shortName, STATUS_LABEL, type Move } from '@/shared/lib';
 import { Icon } from '@/shared/ui';
 
 function waitText(task: BoardTask, profiles: Profile[]) {
@@ -23,7 +23,7 @@ export function TaskActions({ task, profiles }: { task: BoardTask; profiles: Pro
 
   function run(move: Move) {
     const text = comment.trim();
-    if (move.needComment && !text) {
+    if (move.needComment && !hasComment(text)) {
       setError(COMMENT_REQUIRED);
       commentRef.current?.focus();
       return;
@@ -38,7 +38,7 @@ export function TaskActions({ task, profiles }: { task: BoardTask; profiles: Pro
   return (
     <aside
       className={`tile tk-act w ${moves.length ? 'is-go' : isDone ? 'is-done' : ''}`}
-      style={{ '--d': '25ms' } as CSSProperties}
+      style={delay('25ms')}
       aria-label="Действия"
     >
       <span className="fx" aria-hidden="true"></span>

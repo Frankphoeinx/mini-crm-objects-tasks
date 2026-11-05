@@ -128,6 +128,25 @@ describe('Picker', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
+  it('прокрутка соседнего поля не закрывает: кнопка на месте', () => {
+    render(
+      <>
+        <textarea aria-label="Название" />
+        <Host />
+      </>,
+    );
+    open();
+    fireEvent.scroll(screen.getByLabelText('Название'));
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('после закрытия фокус на кнопке, Esc и Tab в окне продолжают работать', () => {
+    render(<Host />);
+    open();
+    fireEvent.scroll(window);
+    expect(screen.getByRole('button', { name: 'Исполнитель' })).toHaveFocus();
+  });
+
   it('смена размера окна закрывает', () => {
     render(<Host />);
     open();

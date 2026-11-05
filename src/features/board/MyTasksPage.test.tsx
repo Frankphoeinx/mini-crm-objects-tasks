@@ -54,7 +54,7 @@ describe('MyTasksPage: шапка', () => {
 
   it('чёрный блок считает всё на проверке и ведёт на /review', async () => {
     show([...mine, makeTask({ id: 'e', status: 'review', assignee_id: otherWorker.id })], manager);
-    const block = screen.getByRole('button', { name: /Ждут проверки/ });
+    const block = screen.getByRole('link', { name: /Ждут проверки/ });
     expect(block.querySelector('.big-n')).toHaveTextContent('2');
     await userEvent.click(block);
     expect(where().pathname).toBe('/review');
@@ -64,7 +64,7 @@ describe('MyTasksPage: шапка', () => {
 describe('MyTasksPage: доска', () => {
   it('только свои задачи', () => {
     show([makeTask({ id: 'a', title: 'Моя', assignee_id: manager.id }), makeTask({ id: 'b', title: 'Чужая' })], manager);
-    expect(screen.getByRole('button', { name: 'Моя' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Моя' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Чужая' })).not.toBeInTheDocument();
     expect(screen.getByText('Всего: 1')).toBeInTheDocument();
   });
@@ -78,7 +78,7 @@ describe('MyTasksPage: доска', () => {
 
   it('название открывает задачу с отметкой «из моих»', async () => {
     show([makeTask()]);
-    await userEvent.click(screen.getByRole('button', { name: 'Залить фундамент' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Залить фундамент' }));
     expect(where()).toEqual({ pathname: '/tasks/t1', state: { from: 'my' } });
   });
 
@@ -104,7 +104,7 @@ describe('MyTasksPage: состояния', () => {
     expect(screen.getByText('Всего: 0')).toBeInTheDocument();
     expect(document.querySelector('.board')).toBeNull();
 
-    await userEvent.click(screen.getByRole('button', { name: 'К объектам' }));
+    await userEvent.click(screen.getByRole('link', { name: 'К объектам' }));
     expect(where().pathname).toBe('/objects');
   });
 

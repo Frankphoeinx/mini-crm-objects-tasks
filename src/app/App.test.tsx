@@ -140,6 +140,25 @@ describe('состояния каркаса', () => {
     expect(await screen.findByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
   });
 
+  it('сбой фонового обновления профиля не снимает сайт: открытые окна и ввод целы', async () => {
+    const { queryClient } = setup('/objects');
+    signedIn(worker);
+    expect(await screen.findByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
+
+    fake.respond('profiles', { error: { message: 'TypeError: Failed to fetch' }, status: 0 });
+    await act(() => queryClient.refetchQueries({ predicate: (q) => JSON.stringify(q.queryKey).includes('profile') }));
+    expect(screen.getByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
+  });
+
+  it('при первом открытии фокус не перепрыгивает шапку, после смены экрана он в начале экрана', async () => {
+    const { router } = setup('/objects');
+    signedIn(worker);
+    await screen.findByRole('navigation', { name: 'Разделы' });
+    expect(document.querySelector('main')).not.toHaveFocus();
+    await act(() => router.navigate('/my'));
+    expect(document.querySelector('main')).toHaveFocus();
+  });
+
   it('пользователь без профиля дальше не проходит и может выйти', async () => {
     fake.respond('profiles', { data: null });
     const user = userEvent.setup();
@@ -157,7 +176,7 @@ describe('состояния каркаса', () => {
     signedIn(worker);
     expect(await screen.findByRole('heading', { name: 'Здесь ничего нет' })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'К объектам' }));
+    await user.click(screen.getByRole('link', { name: 'К объектам' }));
     expect(pathOf(router)).toBe('/objects');
   });
 
@@ -178,8 +197,8 @@ describe('верхняя панель', () => {
     signedIn(manager);
     expect(await screen.findByText('Анна Смирнова')).toBeInTheDocument();
     expect(screen.getByText('Постановщик')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Объекты' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('button', { name: 'Мои задачи' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Объекты' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Мои задачи' })).not.toHaveAttribute('aria-current');
     expect(document.querySelector('.tab-n')).not.toBeInTheDocument();
   });
 
@@ -202,12 +221,12 @@ describe('верхняя панель', () => {
     const user = userEvent.setup();
     const { router } = setup('/objects');
     signedIn(worker);
-    await user.click(await screen.findByRole('button', { name: 'Мои задачи' }));
+    await user.click(await screen.findByRole('link', { name: 'Мои задачи' }));
     expect(pathOf(router)).toBe('/my');
-    expect(screen.getByRole('button', { name: 'Мои задачи' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Мои задачи' })).toHaveAttribute('aria-current', 'page');
     expect(document.querySelector('.tabs-thumb')).toHaveStyle({ transform: 'translateX(100%)' });
 
-    await user.click(screen.getByRole('button', { name: 'Объекты' }));
+    await user.click(screen.getByRole('link', { name: 'Объекты' }));
     expect(pathOf(router)).toBe('/objects');
   });
 
@@ -280,7 +299,7 @@ describe('окно отмены внутри сайта', () => {
 
   it('переход между экранами окно не закрывает', async () => {
     await startMove();
-    fireEvent.click(screen.getByRole('button', { name: 'Объекты' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Объекты' }));
     await advance(0);
     expect(screen.getByRole('button', { name: 'Отменить' })).toBeInTheDocument();
     await advance(10_000);

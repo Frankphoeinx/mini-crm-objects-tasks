@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef, useState, type ComponentProps } from 'react';
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, type ComponentProps } from 'react';
+import { useLeaveGuard } from '@/shared/lib';
 
 type EditLineProps = Omit<ComponentProps<'textarea'>, 'value' | 'onChange' | 'onBlur' | 'onKeyDown' | 'rows'> & {
   value: string;
@@ -15,6 +16,7 @@ export function EditLine({ value, onSave, required = false, oneLine = false, ...
   // Черновик есть только после ввода: пока он есть, фоновое обновление данных текст в поле не трогает.
   const [draft, setDraft] = useState<string | null>(null);
   const ref = useRef<HTMLTextAreaElement>(null);
+  const sending = useRef<string | null>(null);
   const text = draft ?? value;
 
   // Браузеру без field-sizing (см. .edit-line в стилях) высоту поля считаем сами.
@@ -33,11 +35,21 @@ export function EditLine({ value, onSave, required = false, oneLine = false, ...
     }
     // Текст держим до ответа базы, иначе в поле мелькнёт старое. Начатый за это время новый ввод не трогаем.
     // При отказе черновик остаётся: набранное не пропадёт и уйдёт при следующем выходе из поля.
+    if (next === sending.current) return;
+    sending.current = next;
     setDraft(next);
     void onSave(next).then((saved) => {
+      sending.current = null;
       if (saved !== false) setDraft((current) => (current === next ? null : current));
     });
   }
+
+  useLeaveGuard(() => draft !== null && draft.trim() !== value);
+  // Переход браузерной кнопкой «назад» снимает поле без события ухода из него.
+  const saveOnLeave = useEffectEvent(() => {
+    if (draft !== null) finish(draft);
+  });
+  useEffect(() => saveOnLeave, []);
 
   return (
     <textarea

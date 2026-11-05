@@ -245,11 +245,11 @@ select is_empty($$ select 1 from public.task_board where id = pg_temp.id('task-b
 select is(pg_temp.affected($$ update public.tasks set title = 'После удаления' where id = pg_temp.id('task-b') $$), 0, 'постановщик не правит удалённую задачу');
 select throws_ok(
   $$ select public.delete_task(pg_temp.id('task-b')) $$,
-  'P0002', 'Задача не найдена', 'повторное удаление задачи'
+  'PT404', 'Задача не найдена', 'повторное удаление задачи'
 );
 select throws_ok(
   $$ select public.change_task_status(pg_temp.id('task-b'), 'review') $$,
-  'P0002', 'Задача не найдена', 'смена статуса удалённой задачи'
+  'PT404', 'Задача не найдена', 'смена статуса удалённой задачи'
 );
 
 select pg_temp.login('w2');
@@ -258,7 +258,7 @@ select is_empty($$ select 1 from public.task_events where task_id = pg_temp.id('
 select is_empty($$ select 1 from public.objects where id = pg_temp.id('obj-b') $$, 'объект без неудалённых задач исполнитель больше не видит');
 select throws_ok(
   $$ select public.change_task_status(pg_temp.id('task-b'), 'review') $$,
-  'P0002', 'Задача не найдена', 'исполнитель не меняет статус удалённой задачи'
+  'PT404', 'Задача не найдена', 'исполнитель не меняет статус удалённой задачи'
 );
 
 select pg_temp.logout();
@@ -270,7 +270,7 @@ select results_eq(
 );
 select throws_ok(
   $$ update public.tasks set title = 'Владелец' where id = pg_temp.id('task-b') $$,
-  'P0002', 'Задача не найдена', 'триггер запрещает правку удалённой задачи даже владельцу'
+  'PT404', 'Задача не найдена', 'триггер запрещает правку удалённой задачи даже владельцу'
 );
 
 -- Удаление объекта: скрывает задачи, событие только у неудалённых.
@@ -281,23 +281,23 @@ select is_empty($$ select 1 from public.objects where id = pg_temp.id('obj-b') $
 select is_empty($$ select 1 from public.tasks where object_id = pg_temp.id('obj-b') $$, 'задачи объекта скрылись');
 select throws_ok(
   $$ select public.delete_object(pg_temp.id('obj-b')) $$,
-  'P0002', 'Объект не найден', 'повторное удаление объекта'
+  'PT404', 'Объект не найден', 'повторное удаление объекта'
 );
 select throws_ok(
   $$ select public.delete_object(gen_random_uuid()) $$,
-  'P0002', 'Объект не найден', 'несуществующий объект'
+  'PT404', 'Объект не найден', 'несуществующий объект'
 );
 select throws_ok(
   $$ select public.delete_task(gen_random_uuid()) $$,
-  'P0002', 'Задача не найдена', 'несуществующая задача'
+  'PT404', 'Задача не найдена', 'несуществующая задача'
 );
 select throws_ok(
   $$ insert into public.tasks (object_id, title) values (pg_temp.id('obj-b'), 'В удалённый') $$,
-  'P0002', 'Объект не найден', 'задачу нельзя создать в удалённом объекте'
+  'PT404', 'Объект не найден', 'задачу нельзя создать в удалённом объекте'
 );
 select throws_ok(
   $$ update public.tasks set object_id = pg_temp.id('obj-b') where id = pg_temp.id('task-self') $$,
-  'P0002', 'Объект не найден', 'задачу нельзя перенести в удалённый объект'
+  'PT404', 'Объект не найден', 'задачу нельзя перенести в удалённый объект'
 );
 select is(pg_temp.affected($$ update public.objects set name = 'После удаления' where id = pg_temp.id('obj-b') $$), 0, 'постановщик не правит удалённый объект');
 select lives_ok($$ update public.tasks set description = 'Всем' $$, 'правка без условия обходит удалённые задачи');
@@ -317,7 +317,7 @@ select results_eq(
 select ok((select deleted_at is not null from public.objects where id = pg_temp.id('obj-b')), 'удалённый объект остался в базе');
 select throws_ok(
   $$ update public.objects set name = 'Владелец' where id = pg_temp.id('obj-b') $$,
-  'P0002', 'Объект не найден', 'триггер запрещает правку удалённого объекта даже владельцу'
+  'PT404', 'Объект не найден', 'триггер запрещает правку удалённого объекта даже владельцу'
 );
 
 select * from finish();

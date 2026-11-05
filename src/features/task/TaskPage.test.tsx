@@ -121,7 +121,7 @@ describe('состояния экрана', () => {
     expect(await screen.findByRole('heading', { name: 'Здесь ничего нет' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Повторить' })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'К объектам' }));
+    fireEvent.click(screen.getByRole('link', { name: 'К объектам' }));
     expect(where()).toBe('/objects');
   });
 
@@ -303,7 +303,7 @@ describe('исполнитель и объект через список', () =>
     await user.click(await option(/Склад на Южной/));
     await waitFor(() => expect(updates()).toEqual([{ object_id: south.id }]));
 
-    await user.click(await screen.findByRole('button', { name: 'Склад на Южной' }));
+    await user.click(await screen.findByRole('link', { name: 'Склад на Южной' }));
     expect(where()).toBe(`/objects/${south.id}`);
   });
 
@@ -315,7 +315,7 @@ describe('исполнитель и объект через список', () =>
     await user.click(await option(/Склад на Южной/));
     expect(await screen.findByRole('button', { name: 'Объект: Склад на Южной' })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Мои задачи' }));
+    await user.click(screen.getByRole('link', { name: 'Мои задачи' }));
     expect(where()).toBe('/my');
   });
 });
@@ -331,14 +331,14 @@ describe('возврат назад и удаление', () => {
   it.each(BACK_CASES)('открыта из %s: кнопка «%s» ведёт на %s', async (from, label, path) => {
     const user = userEvent.setup();
     open({ from });
-    await user.click(screen.getByRole('button', { name: label }));
+    await user.click(screen.getByRole('link', { name: label }));
     expect(where()).toBe(path);
   });
 
   it('список объектов отстал от задачи: кнопка всё равно подписана и ведёт на объект', async () => {
     const user = userEvent.setup();
     open({ objects: [] });
-    await user.click(screen.getByRole('button', { name: 'Объект' }));
+    await user.click(screen.getByRole('link', { name: 'Объект' }));
     expect(where()).toBe('/objects/o1');
   });
 

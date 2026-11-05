@@ -9,6 +9,9 @@ export const STATUS_LABEL: Record<TaskStatus, string> = {
   accepted: 'Принята',
 };
 
+/** Причина должна читаться: нужна буква или цифра. База проверяет то же своим правилом. */
+export const hasComment = (text: string) => /[\p{L}\p{N}]/u.test(text);
+
 export const COMMENT_REQUIRED = 'Напишите, что нужно исправить: без комментария вернуть нельзя.';
 
 export type Move = {

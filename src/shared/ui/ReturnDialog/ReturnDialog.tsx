@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react';
-import { COMMENT_REQUIRED } from '../../lib/status';
+import { COMMENT_REQUIRED, hasComment } from '../../lib/status';
 import { Dialog } from '../Dialog';
 
 const TITLE = 'Вернуть на доработку';
@@ -21,7 +21,7 @@ export function ReturnDialog({ taskTitle, initialComment = '', onConfirm, onClos
   function save(e: FormEvent) {
     e.preventDefault();
     const text = comment.trim();
-    if (text) {
+    if (hasComment(text)) {
       onConfirm(text);
       return;
     }

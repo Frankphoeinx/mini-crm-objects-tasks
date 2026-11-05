@@ -60,7 +60,7 @@ describe('шапка', () => {
     expect(screen.getByText('ул. Лесная, 14')).toBeInTheDocument();
     expect(screen.getByText('4 задачи')).toBeInTheDocument();
     expect(screen.getByText('На доработке')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ждут проверки/ })).toHaveTextContent('1');
+    expect(screen.getByRole('link', { name: /Ждут проверки/ })).toHaveTextContent('1');
     expect(screen.getByText('Готовность').parentElement).toHaveTextContent('Принято 1 из 4');
     expect(screen.getByText('25%')).toHaveClass('sr');
     expect(manage().edit).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('шапка', () => {
     [/Ждут проверки/, '/review'],
   ])('%s ведёт на %s', async (name, path) => {
     renderPage();
-    await userEvent.click(screen.getByRole('button', { name }));
+    await userEvent.click(screen.getByRole('link', { name }));
     expect(where()).toHaveTextContent(new RegExp(`^${path}$`));
   });
 
@@ -122,7 +122,7 @@ describe('состояния', () => {
     expect(screen.getByText('Доска')).toBeInTheDocument();
     expect(screen.queryByText(/задач/)).not.toBeInTheDocument();
     expect(screen.queryByText('Готовность')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Ждут проверки/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ждут проверки/ })).not.toBeInTheDocument();
     expect(manage().del).toBeDisabled();
   });
 
@@ -156,7 +156,7 @@ describe('состояния', () => {
     expect(await screen.findByRole('heading', { name: 'Здесь ничего нет' })).toBeInTheDocument();
     expect(screen.queryByText('Доска')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Повторить' })).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Все объекты' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Все объекты' }));
     expect(where()).toHaveTextContent('/objects');
   });
 

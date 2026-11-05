@@ -1,4 +1,4 @@
-import { Outlet, ScrollRestoration, useNavigate, useParams, type RouteObject } from 'react-router';
+import { Link, Outlet, ScrollRestoration, useParams, type RouteObject } from 'react-router';
 import { MyTasksPage, ObjectBoard } from '@/features/board';
 import { ObjectPage, ObjectsPage } from '@/features/objects';
 import { ReviewPage } from '@/features/review';
@@ -20,13 +20,12 @@ function TaskRoute() {
 }
 
 function NotFoundRoute() {
-  const navigate = useNavigate();
   return (
     <NotFoundState
       action={
-        <button className="btn is-primary" type="button" onClick={() => navigate(paths.objects)}>
+        <Link className="btn is-primary" to={paths.objects}>
           К объектам
-        </button>
+        </Link>
       }
     />
   );

@@ -43,7 +43,10 @@ export function useCardDrag(tasks: BoardTask[], role: Role, onDrop: (task: Board
         setOver(null);
         if (!ended?.last || ended.last === ended.from) return;
         const move = ended.moves.find((m) => m.to === ended.last);
-        if (!move) showToast(deniedMoveText(ended.task.status, ended.moves));
+        // Отпустили мимо доски: это отмена, а не запретный бросок. Firefox не даёт координат в dragend, у него подсказка остаётся.
+        const outside = (e.clientX || e.clientY) && !document.elementFromPoint(e.clientX, e.clientY)?.closest('.col');
+        if (!move && !outside) showToast(deniedMoveText(ended.task.status, ended.moves));
+        else if (!move) return;
         else if (e.dataTransfer.dropEffect !== 'none') onDrop(ended.task, move);
       },
     };

@@ -1,5 +1,5 @@
-import { useState, ViewTransition } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { useEffect, useRef, useState, ViewTransition } from 'react';
+import { Link, Outlet, useLocation } from 'react-router';
 import { signOut, useMe, useMyTurnCount } from '@/shared/api';
 import { paths } from '@/shared/lib';
 import { Icon, useToast } from '@/shared/ui';
@@ -9,7 +9,15 @@ export function AppLayout() {
   const me = useMe();
   const turn = useMyTurnCount();
   const location = useLocation();
-  const navigate = useNavigate();
+  const mainRef = useRef<HTMLElement>(null);
+  const shownPath = useRef(location.pathname);
+
+  // Кнопка, по которой ушли со страницы (удаление, смена экрана), исчезла: клавиатура продолжает с начала нового экрана, а не с начала сайта.
+  useEffect(() => {
+    if (shownPath.current === location.pathname) return;
+    shownPath.current = location.pathname;
+    if (document.activeElement === document.body) mainRef.current?.focus({ preventScroll: true });
+  }, [location.pathname]);
   const { showToast } = useToast();
   const [leaving, setLeaving] = useState(false);
   const tab = activeTab(location.pathname, location.state);
@@ -34,27 +42,17 @@ export function AppLayout() {
         </div>
         <nav className="tile tabs" aria-label="Разделы">
           <span className="tabs-thumb" style={{ transform: `translateX(${tab === 'my' ? '100%' : '0%'})` }} aria-hidden="true"></span>
-          <button
-            className={tab === 'objects' ? 'tab is-active' : 'tab'}
-            type="button"
-            aria-current={tab === 'objects' ? 'page' : undefined}
-            onClick={() => navigate(paths.objects)}
-          >
+          <Link className={tab === 'objects' ? 'tab is-active' : 'tab'} to={paths.objects} aria-current={tab === 'objects' ? 'page' : undefined}>
             Объекты
-          </button>
-          <button
-            className={tab === 'my' ? 'tab is-active' : 'tab'}
-            type="button"
-            aria-current={tab === 'my' ? 'page' : undefined}
-            onClick={() => navigate(paths.my)}
-          >
+          </Link>
+          <Link className={tab === 'my' ? 'tab is-active' : 'tab'} to={paths.my} aria-current={tab === 'my' ? 'page' : undefined}>
             Мои задачи
             {turn > 0 && (
               <span className="tab-n" aria-label={`ждут вашего действия: ${turn}`}>
                 {turn}
               </span>
             )}
-          </button>
+          </Link>
         </nav>
         <div className="tile user">
           <span className="ava" aria-hidden="true">
@@ -70,7 +68,7 @@ export function AppLayout() {
         </div>
       </header>
       <ViewTransition default="bs-page">
-        <main className="page-main">
+        <main className="page-main" ref={mainRef} tabIndex={-1}>
           <Outlet />
         </main>
       </ViewTransition>
