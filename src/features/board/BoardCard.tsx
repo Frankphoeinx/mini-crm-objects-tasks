@@ -41,7 +41,16 @@ export function BoardCard({ task, meta, moves, fresh, delay, dragging, landed, d
       data-card={task.id}
       draggable={needsMe}
       style={{ '--d': delay } as CSSProperties}
-      {...(needsMe ? dragProps : {})}
+      {...(needsMe
+        ? {
+            ...dragProps,
+            // Пока начинался перенос, курсор мог пройти над кнопкой: mouseleave с неё во время переноса не придёт.
+            onDragStart(e: DragEvent) {
+              onTarget(null);
+              dragProps.onDragStart(e);
+            },
+          }
+        : {})}
     >
       <span className="kfx" aria-hidden="true"></span>
       {needsMe && (
