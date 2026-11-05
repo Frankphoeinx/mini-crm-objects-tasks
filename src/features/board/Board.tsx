@@ -135,14 +135,11 @@ export function Board({ tasks, from, metaOf, onAdd, people }: BoardProps) {
           onPick={(id) => {
             if (!id) return;
             const taskId = assigning.task.id;
-            assign.mutate(
-              { id: taskId, patch: { assignee_id: id } },
-              {
-                onError: (error) => showToast(userMessage(error), ERROR_TOAST_MS),
-                // Кнопка «Назначить» исчезает после ответа базы.
-                onSettled: () => void setTimeout(() => focusTask(taskId), FOCUS_DELAY_MS),
-              },
-            );
+            void assign
+              .mutateAsync({ id: taskId, patch: { assignee_id: id } })
+              .catch((error: unknown) => showToast(userMessage(error), ERROR_TOAST_MS))
+              // Кнопка «Назначить» исчезает после ответа базы.
+              .finally(() => setTimeout(() => focusTask(taskId), FOCUS_DELAY_MS));
           }}
           onClose={() => setAssigning(null)}
         />

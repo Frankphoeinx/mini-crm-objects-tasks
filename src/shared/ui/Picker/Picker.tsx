@@ -116,8 +116,8 @@ export function Picker({ anchor, options, value, onPick, onClose }: PickerProps)
       <div
         className="picker"
         ref={listRef}
-        data-picker="1"
         role="listbox"
+        aria-label="Варианты выбора"
         style={{ left: place.left, top: place.top, width: place.width }}
         onKeyDown={onKeyDown}
       >

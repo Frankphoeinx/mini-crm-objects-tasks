@@ -22,7 +22,8 @@ export function RequireAuth() {
       </Screen>
     );
   }
-  if (profile.isError) {
+  // isError истинно и при сбое фонового обновления: уже загруженный профиль не должен снимать весь сайт.
+  if (!profile.data && profile.isError) {
     return (
       <Screen>
         <ErrorState error={profile.error} onRetry={() => void profile.refetch()} />

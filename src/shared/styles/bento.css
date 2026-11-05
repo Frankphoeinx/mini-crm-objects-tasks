@@ -396,7 +396,7 @@ button .big-l::after { content: ' →'; }
 .tk-title { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .tk-act { display: flex; flex-direction: column; gap: 14px; }
 /* Правка на месте: поле выглядит как текст, сохраняется при уходе из поля.
-   shortcut: field-sizing нет в Firefox, на настоящем сайте высоту подгоним скриптом. */
+   field-sizing нет в Firefox, там высоту считает EditLine. */
 .edit-line { display: block; width: calc(100% + 16px); margin: 0 -8px; padding: 2px 8px; background: none; border: 0; border-radius: 10px; resize: none; overflow: hidden; field-sizing: content; transition: background-color .12s; }
 .edit-line:focus { background: #FFFFFF; }
 @media (hover: hover) {
@@ -406,7 +406,6 @@ button .big-l::after { content: ' →'; }
 .tk-manage { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .h1.is-task { font-size: clamp(30px, 3.8vw, 52px); }
 .tk-desc { margin: 0; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
-.edit-line.tk-desc { margin: 0 -8px; }
 .fx { position: absolute; inset: 0; z-index: 2; border-radius: inherit; overflow: hidden; pointer-events: none; }
 .flash-rework .tk-title > .fx::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 45%; background: var(--hazard); animation: bs-sweep .34s var(--out) both; }
 .flash-accepted .tk-act > .fx::after { content: ''; position: absolute; inset: 0; background: var(--acc); animation: bs-flash .34s ease-out both; }
@@ -480,10 +479,10 @@ button .big-l::after { content: ' →'; }
 
 /* Окна и подсказка */
 .veil { position: fixed; inset: 0; z-index: 40; display: flex; padding: 16px; background: rgba(17, 17, 17, .46); overflow: auto; animation: bs-fade .16s ease-out; }
-.veil.is-closing, .veil.is-leaving { opacity: 0; transition: opacity .12s; pointer-events: none; }
+.veil.is-closing { opacity: 0; transition: opacity .12s; pointer-events: none; }
 @keyframes bs-fade { from { opacity: 0; } }
 .dialog { position: relative; display: flex; flex-direction: column; gap: 14px; width: min(560px, 100%); margin: auto; padding: clamp(20px, 3vw, 32px); background: #FFFFFF; border-radius: var(--r-xl); overflow: hidden; animation: bs-dialog .2s var(--pop); transition: transform .12s var(--out); }
-.is-closing > .dialog, .is-leaving > .dialog { transform: translateY(6px) scale(.98); }
+.is-closing > .dialog { transform: translateY(6px) scale(.98); }
 @keyframes bs-dialog { from { opacity: 0; transform: translateY(12px) scale(.96); } }
 .dialog h2 { margin: 0; font-size: clamp(24px, 3vw, 32px); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; overflow-wrap: anywhere; }
 .dialog p { margin: 0; }

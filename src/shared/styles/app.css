@@ -4,7 +4,7 @@
 ::view-transition-old(.bs-page) { animation: bs-vt-out .12s ease-out both; }
 ::view-transition-new(.bs-page) { animation: bs-vt-in .2s cubic-bezier(.16, 1, .3, 1) both; }
 
-/* На холсте смену экрана отключал скрипт. Здесь переход запускает React, поэтому движение гасит стиль. */
+/* Здесь переход запускает React, поэтому движение гасит стиль. */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
@@ -12,7 +12,7 @@
 /* Рабочая часть страницы: раскладывает экраны так же, как .page раскладывал их на холсте. */
 .page-main { flex: 1; display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
 
-/* Состояние отправки: на холсте сети не было. */
+/* Состояние отправки. */
 .bs button:disabled { cursor: progress; opacity: .6; }
 
 /* На телефоне нажимаемое не ниже 44 px. */

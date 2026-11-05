@@ -365,7 +365,7 @@ describe('панель', () => {
     expect(fireEvent.mouseDown(screen.getByRole('button', { name: 'Добавить картинку' }))).toBe(false);
   });
 
-  it('кнопки только из брифа, отмена и повтор на клавиатуре', async () => {
+  it('кнопки только нужные, отмена и повтор на клавиатуре', async () => {
     const { onSave } = openEditor();
     expect(screen.getAllByRole('button').map((button) => button.getAttribute('aria-label'))).toEqual(['Жирный', 'Курсив', 'Заголовок', 'Маркированный список', 'Нумерованный список', 'Добавить картинку']);
     edit('Ещё ');
@@ -449,6 +449,29 @@ describe('картинка в редакторе', () => {
     fireEvent.change(fileInput(), { target: { files: [pngFile()] } });
     await waitFor(() => expect(onSave).toHaveBeenCalledOnce());
     expect(onSave.mock.lastCall?.[0]).toMatch(/!\[\]\(.+\.png\)/);
+  });
+
+  it('несколько картинок: одно сохранение после всех, а не запись в историю на каждую', async () => {
+    const { onSave } = openEditor();
+    await field();
+    fireEvent.change(fileInput(), { target: { files: [pngFile(), pngFile(), pngFile()] } });
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
+    expect(onSave).toHaveBeenCalledOnce();
+  });
+
+  it('несохранённая правка: браузер предупреждает при закрытии, уход с экрана её сохраняет', async () => {
+    const { onSave, unmount } = openEditor();
+    await screen.findByRole('textbox', { name: 'Описание' });
+    const leaving = () => {
+      const event = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(leaving()).toBe(false);
+    edit('Ещё ');
+    expect(leaving()).toBe(true);
+    unmount();
+    expect(onSave).toHaveBeenCalledOnce();
   });
 
   it('картинка сохраняется сразу: закрытая вкладка не оставит файл без описания', async () => {

@@ -272,6 +272,20 @@ describe('UndoProvider', () => {
     expect(screen.getByRole('button', { name: 'Отменить' })).toBeTruthy();
   });
 
+  it('окно отмены открыто: браузер предупреждает при закрытии вкладки', () => {
+    setup();
+    const leaving = () => {
+      const event = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(leaving()).toBe(false);
+    act(() => run(makeAction()));
+    expect(leaving()).toBe(true);
+    undo();
+    expect(leaving()).toBe(false);
+  });
+
   it('кнопка ушла вместе с карточкой: фокус на названии карточки, а не в начале страницы', async () => {
     setup();
     const card = document.createElement('article');

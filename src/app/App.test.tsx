@@ -140,6 +140,25 @@ describe('состояния каркаса', () => {
     expect(await screen.findByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
   });
 
+  it('сбой фонового обновления профиля не снимает сайт: открытые окна и ввод целы', async () => {
+    const { queryClient } = setup('/objects');
+    signedIn(worker);
+    expect(await screen.findByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
+
+    fake.respond('profiles', { error: { message: 'TypeError: Failed to fetch' }, status: 0 });
+    await act(() => queryClient.refetchQueries({ predicate: (q) => JSON.stringify(q.queryKey).includes('profile') }));
+    expect(screen.getByRole('navigation', { name: 'Разделы' })).toBeInTheDocument();
+  });
+
+  it('при первом открытии фокус не перепрыгивает шапку, после смены экрана он в начале экрана', async () => {
+    const { router } = setup('/objects');
+    signedIn(worker);
+    await screen.findByRole('navigation', { name: 'Разделы' });
+    expect(document.querySelector('main')).not.toHaveFocus();
+    await act(() => router.navigate('/my'));
+    expect(document.querySelector('main')).toHaveFocus();
+  });
+
   it('пользователь без профиля дальше не проходит и может выйти', async () => {
     fake.respond('profiles', { data: null });
     const user = userEvent.setup();

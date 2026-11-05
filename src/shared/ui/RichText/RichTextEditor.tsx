@@ -1,9 +1,10 @@
 import { EditorContent, useEditor, useEditorState, type ChainedCommands, type Editor } from '@tiptap/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { userMessage } from '../../api/errors';
 import { useMe } from '../../api/session';
 import { TASK_IMAGE_TYPES, uploadTaskImage } from '../../api/taskImages';
 import { DESCRIPTION_MAX } from '../../lib/description';
+import { useLeaveGuard } from '../../lib/useLeaveGuard';
 import { Icon, type IconName } from '../Icons';
 import { richTextExtensions } from './extensions';
 import type { RichTextEditorProps } from './RichText';
@@ -21,7 +22,6 @@ const read = (editor: Editor) => editor.getMarkdown().trim();
 /** Редактор описания: панель, картинки, сохранение при уходе. Поведение как у EditLine, но введённое при отказе остаётся. */
 export default function RichTextEditor({ value, onChange, onSave, onUploadingChange, ariaLabel, placeholder }: RichTextEditorProps) {
   const me = useMe();
-  const rootRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [extensions] = useState(() => richTextExtensions(placeholder));
   const [uploadError, setUploadError] = useState('');
@@ -116,21 +116,30 @@ export default function RichTextEditor({ value, onChange, onSave, onUploadingCha
         const src = await uploadTaskImage(file, me.id);
         if (editor.isDestroyed) return;
         editor.commands.insertContent({ type: 'image', attrs: { src } });
-        // Картинка не ждёт ухода из поля: закрытая вкладка не должна оставить файл без описания.
-        save();
       } catch (error) {
         setUploadError(userMessage(error));
       } finally {
         trackUpload(-1);
       }
     }
+    // Картинка не ждёт ухода из поля: закрытая вкладка не должна оставить файл без описания. Одно сохранение на все файлы.
+    if (!editor.isDestroyed) save();
   }
+
+  useLeaveGuard(() => !editor.isDestroyed && read(editor) !== (onSave ? saved.current : ''));
+  // Переход браузерной кнопкой «назад» снимает редактор без события ухода из него.
+  const saveOnLeave = useEffectEvent(() => save());
+  useEffect(
+    () => () => {
+      if (!editor.isDestroyed) saveOnLeave();
+    },
+    [editor],
+  );
 
   const tooLong = length > DESCRIPTION_MAX;
 
   return (
     <div
-      ref={rootRef}
       className="rt"
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) save();

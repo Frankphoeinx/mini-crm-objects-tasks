@@ -6,7 +6,7 @@ export function focusTask(taskId: string) {
   if (document.activeElement && document.activeElement !== document.body) return;
   const target =
     document.querySelector<HTMLElement>(`[data-card="${taskId}"] .kopen`) ??
-    document.querySelector<HTMLElement>('.tk-act .btn, .tk-act .input') ??
+    document.querySelector<HTMLElement>('.tk-act .btn') ??
     document.querySelector<HTMLElement>('main');
   target?.focus({ preventScroll: true });
 }

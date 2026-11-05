@@ -12,7 +12,7 @@
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
-    "gen:types": "supabase gen types typescript --local --schema public > src/shared/api/database.generated.ts"
+    "gen:types": "npx supabase gen types typescript --local --schema public > .types.tmp && mv .types.tmp src/shared/api/database.generated.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0",

@@ -11,9 +11,12 @@ export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const mainRef = useRef<HTMLElement>(null);
+  const shownPath = useRef(location.pathname);
 
   // Кнопка, по которой ушли со страницы (удаление, смена экрана), исчезла: клавиатура продолжает с начала нового экрана, а не с начала сайта.
   useEffect(() => {
+    if (shownPath.current === location.pathname) return;
+    shownPath.current = location.pathname;
     if (document.activeElement === document.body) mainRef.current?.focus({ preventScroll: true });
   }, [location.pathname]);
   const { showToast } = useToast();
